@@ -1,0 +1,16 @@
+$kind: http-request
+name: auth check
+url: http://localhost:5000/api/auth/check
+method: GET
+body:
+  type: json
+  content: "{\r
+
+    \  \"fullName\": \"Bob Smith\",\r
+
+    \  \"email\": \"bob@example.com\",\r
+
+    \  \"password\": \"password123\"\r
+
+    }"
+order: 2241110186082028

@@ -1,0 +1,8 @@
+$kind: http-request
+name: New Request
+url: http://localhost:5000/api/auth/delete
+method: DELETE
+body:
+  type: json
+  content: ""
+order: 3354659304795343
