@@ -31,7 +31,7 @@ export const getChatPartners = async (req, res) => {
     });
     const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
 
-    GET /api/messages/:userId    res.status(200).json(chatPartners);
+    res.status(200).json(chatPartners);
 
   } catch (error) {
     console.error("Error in getChatPartners controller:", error.message);
