@@ -17,21 +17,21 @@ export const getAllContacts = async (req, res) => {
 
 export const getChatPartners = async (req, res) => {
   try {
-    const loggedInUserId = req.user._id
+    const loggedInUserId = req.user._id.toString();
     const messages = await Message.find({
       $or: [
         { senderId: loggedInUserId },
         { receiverId: loggedInUserId }
       ]
-    })
+    });
     const chatPartnerIds = messages.map((msg) => {
-      msg.senderId.toString() === loggedInUserId ?
+      return msg.senderId.toString() === loggedInUserId ?
         msg.receiverId.toString() :
-        msg.senderId.toString()
-    })
+        msg.senderId.toString();
+    });
     const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
 
-    res.status(200).json(chatPartners)
+    GET /api/messages/:userId    res.status(200).json(chatPartners);
 
   } catch (error) {
     console.error("Error in getChatPartners controller:", error.message);
