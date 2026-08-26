@@ -3,14 +3,38 @@ import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 
-export const getUsersForSidebar = async (req, res) => {
+export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
     const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
 
     res.status(200).json(filteredUsers);
   } catch (error) {
-    console.error("Error in getUsersForSidebar:", error.message);
+    console.error("Error in getAllContacts controller:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getChatPartners = async (req, res) => {
+  try {
+    const loggedInUserId = req.user._id
+    const messages = await Message.find({
+      $or: [
+        { senderId: loggedInUserId },
+        { receiverId: loggedInUserId }
+      ]
+    })
+    const chatPartnerIds = messages.map((msg) => {
+      msg.senderId.toString() === loggedInUserId ?
+        msg.receiverId.toString() :
+        msg.senderId.toString()
+    })
+    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+
+    res.status(200).json(chatPartners)
+    
+  } catch (error) {
+    console.error("Error in getChatPartners controller:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
