@@ -32,7 +32,7 @@ export const getChatPartners = async (req, res) => {
     const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
 
     res.status(200).json(chatPartners)
-    
+
   } catch (error) {
     console.error("Error in getChatPartners controller:", error.message);
     res.status(500).json({ error: "Internal server error" });
@@ -63,6 +63,37 @@ export const sendMessage = async (req, res) => {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
+
+    if (!receiverId) {
+      return res.status(400).json({ error: "Receiver ID is required" });
+    }
+
+    if (senderId.toString() === receiverId.toString()) {
+      return res.status(400).json({ error: "You cannot send a message to yourself" });
+    }
+
+    const receiverExists = await User.findById(receiverId);
+    if (!receiverExists) {
+      return res.status(404).json({ error: "Receiver not found" });
+    }
+
+    const cleanedText = typeof text === "string" ? text.trim() : "";
+
+    if (!cleanedText && !image) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    if (text !== undefined && typeof text !== "string") {
+      return res.status(400).json({ error: "Message text must be a string" });
+    }
+
+    if (image && typeof image !== "string") {
+      return res.status(400).json({ error: "Image must be a valid string" });
+    }
+
+    if (image && !image.startsWith("data:image/")) {
+      return res.status(400).json({ error: "Invalid image format" });
+    }
 
     let imageUrl;
     if (image) {
