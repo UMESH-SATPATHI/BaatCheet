@@ -56,9 +56,20 @@ export const deleteAccount = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    req.logout(() => {});
-    req.session.destroy(() => {});
-    res.status(200).json({ message: "Account deleted successfully" });
+    req.logout((logoutError) => {
+      if (logoutError) {
+        return res.status(500).json({ message: "Account deletion logout failed" });
+      }
+
+      req.session.destroy((sessionError) => {
+        if (sessionError) {
+          return res.status(500).json({ message: "Account deletion session cleanup failed" });
+        }
+
+        res.clearCookie("connect.sid");
+        res.status(200).json({ message: "Account deleted successfully" });
+      });
+    });
   } catch (error) {
     console.error("Error in deleteAccount controller:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
