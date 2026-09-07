@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
+import toast from "react-hot-toast";
 import Login from "./pages/Login";
 import Chat from "./pages/Chat";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -12,7 +13,15 @@ export default function Router() {
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
   useEffect(() => {
-    checkAuth();
+    checkAuth().then(() => {
+      const authenticatedUser = useAuthStore.getState().authUser;
+      const pendingGoogleLogin = sessionStorage.getItem("pendingGoogleLogin");
+
+      if (authenticatedUser && pendingGoogleLogin) {
+        toast.success(`Logged in as ${authenticatedUser.fullName || authenticatedUser.email}`);
+        sessionStorage.removeItem("pendingGoogleLogin");
+      }
+    });
   }, [checkAuth]);
 
   if (isCheckingAuth) {
