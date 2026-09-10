@@ -5,6 +5,7 @@ import { useChatStore } from "../store/chatStore";
 export default function NewChatModal({ isOpen, onClose }) {
   const { allContacts, setSelectedUser, setActiveTab } = useChatStore();
   const [searchTerm, setSearchTerm] = useState("");
+  const [failedProfilePics, setFailedProfilePics] = useState(new Set());
 
   if (!isOpen) return null;
 
@@ -55,8 +56,21 @@ export default function NewChatModal({ isOpen, onClose }) {
               className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-[#22222d] cursor-pointer transition"
             >
               <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shrink-0">
-
-                {contact.initials || "BC"}
+                {contact.profilePic && !failedProfilePics.has(contact._id) ? (
+                  <img
+                    src={contact.profilePic}
+                    alt={contact.fullName}
+                    className="w-full h-full rounded-full object-cover"
+                    referrerPolicy="no-referrer"
+                    onError={() =>
+                      setFailedProfilePics((failed) =>
+                        new Set([...failed, contact._id]),
+                      )
+                    }
+                  />
+                ) : (
+                  contact.initials || "BC"
+                )}
               </div>
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-xs font-semibold text-white truncate">
