@@ -3,6 +3,25 @@ import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./authStore";
 
+const formatTime = (date) =>
+  date
+    ? new Date(date).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+    : "";
+
+const getInitials = (fullName) =>
+  fullName
+    ? fullName
+        .split(" ")
+        .map((name) => name[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase()
+    : "BC";
+
 // Audio synthesized effects using Web Audio API for zero-dependency sound
 const playBeep = (frequency = 600, duration = 0.08, type = "sine") => {
   try {
@@ -67,6 +86,21 @@ export const useChatStore = create((set, get) => ({
     set({ contactSearchQuery });
   },
 
+  syncOnlineUsers: (onlineUserIds) => {
+    const onlineUsers = new Set(onlineUserIds.map(String));
+    const updatePresence = (user) => ({
+      ...user,
+      online: onlineUsers.has(String(user._id)),
+      statusText: onlineUsers.has(String(user._id)) ? "online" : "offline",
+    });
+
+    set((state) => ({
+      allContacts: state.allContacts.map(updatePresence),
+      chats: state.chats.map(updatePresence),
+      selectedUser: state.selectedUser ? updatePresence(state.selectedUser) : null,
+    }));
+  },
+
   setSelectedUser: (user) => {
     set({ selectedUser: user });
     if (user) {
@@ -86,19 +120,16 @@ export const useChatStore = create((set, get) => ({
       const response = await axiosInstance.get("/messages/contacts");
       if (Array.isArray(response.data)) {
         const formatted = response.data.map((contact) => {
-          const initials = contact.fullName
-            ? contact.fullName
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .substring(0, 2)
-                .toUpperCase()
-            : "BC";
+          const online = useAuthStore
+            .getState()
+            .onlineUsers
+            .map(String)
+            .includes(String(contact._id));
           return {
             ...contact,
-            initials,
-            online: false,
-            statusText: "offline",
+            initials: getInitials(contact.fullName),
+            online,
+            statusText: online ? "online" : "offline",
           };
         });
         set({ allContacts: formatted });
@@ -119,26 +150,19 @@ export const useChatStore = create((set, get) => ({
       const response = await axiosInstance.get("/messages/chats");
       if (Array.isArray(response.data)) {
         const formatted = response.data.map((c) => {
-          const initials = c.fullName
-            ? c.fullName
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .substring(0, 2)
-                .toUpperCase()
-            : "BC";
+          const online = useAuthStore
+            .getState()
+            .onlineUsers
+            .map(String)
+            .includes(String(c._id));
           return {
             ...c,
-            initials,
-            online: false,
+            initials: getInitials(c.fullName),
+            online,
+            statusText: online ? "online" : "offline",
             unreadCount: 0,
             lastMessage: c.lastMessage || "",
-            lastMessageTime: c.updatedAt
-              ? new Date(c.updatedAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "",
+            lastMessageTime: formatTime(c.lastMessageAt),
           };
         });
         set({ chats: formatted });
@@ -161,10 +185,7 @@ export const useChatStore = create((set, get) => ({
       if (Array.isArray(response.data)) {
         const formatted = response.data.map((msg) => ({
           ...msg,
-          displayTime: new Date(msg.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          displayTime: formatTime(msg.createdAt),
         }));
         set({ messages: formatted });
       } else {
@@ -184,10 +205,7 @@ export const useChatStore = create((set, get) => ({
 
     const myUser = useAuthStore.getState().authUser;
     const now = new Date();
-    const displayTime = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const displayTime = formatTime(now);
 
     const tempMessage = {
       _id: "temp_" + Date.now(),
@@ -203,17 +221,26 @@ export const useChatStore = create((set, get) => ({
 
     // Optimistic local update
     const updatedMessages = [...messages, tempMessage];
+    const chatPreview =
+      messageData.text || (messageData.image ? "📷 Photo" : "📎 File");
+    const existingChat = chats.some((chat) => chat._id === selectedUser._id);
+    const updatedChat = {
+      ...selectedUser,
+      lastMessage: chatPreview,
+      lastMessageTime: displayTime,
+      online: selectedUser.online || false,
+      unreadCount: 0,
+    };
+
     set({
       messages: updatedMessages,
-      chats: chats.map((c) =>
-        c._id === selectedUser._id
-          ? {
-              ...c,
-              lastMessage: messageData.text || (messageData.image ? "📷 Photo" : "📎 File"),
-              lastMessageTime: displayTime,
-            }
-          : c
-      ),
+      chats: existingChat
+        ? chats.map((chat) =>
+            chat._id === selectedUser._id
+              ? { ...chat, ...updatedChat }
+              : chat,
+          )
+        : [updatedChat, ...chats],
     });
 
     if (isSoundEnabled) {
@@ -258,35 +285,41 @@ export const useChatStore = create((set, get) => ({
         playBeep(520, 0.1, "sine");
       }
 
-      if (selectedUser && newMessage.senderId === selectedUser._id) {
+      const senderId = String(newMessage.senderId);
+      const selectedUserId = selectedUser ? String(selectedUser._id) : null;
+
+      if (selectedUser && senderId === selectedUserId) {
         const formatted = {
           ...newMessage,
-          displayTime: new Date(newMessage.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          displayTime: formatTime(newMessage.createdAt),
         };
         set({ messages: [...get().messages, formatted] });
       }
 
-      // Update chats list last message
-      set({
-        chats: chats.map((c) =>
-          c._id === newMessage.senderId
-            ? {
-                ...c,
-                lastMessage: newMessage.text || "Attachment",
-                lastMessageTime: new Date(newMessage.createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-                unreadCount:
-                  selectedUser?._id === newMessage.senderId
-                    ? 0
-                    : (c.unreadCount || 0) + 1,
-              }
-            : c
+      const contact = get().allContacts.find(
+        (candidate) => String(candidate._id) === senderId,
+      );
+      const existingChat = chats.find((chat) => String(chat._id) === senderId);
+      const chatUpdate = {
+        ...(existingChat || contact || newMessage.sender || { _id: senderId }),
+        ...(newMessage.sender || {}),
+        _id: senderId,
+        initials: getInitials(
+          newMessage.sender?.fullName || contact?.fullName || existingChat?.fullName,
         ),
+        lastMessage: newMessage.text || (newMessage.image ? "📷 Photo" : "📎 File"),
+        lastMessageTime: formatTime(newMessage.createdAt),
+        online: true,
+        statusText: "online",
+        unreadCount: selectedUserId === senderId ? 0 : (existingChat?.unreadCount || 0) + 1,
+      };
+
+      set({
+        chats: existingChat
+          ? chats.map((chat) =>
+              String(chat._id) === senderId ? { ...chat, ...chatUpdate } : chat,
+            )
+          : [chatUpdate, ...chats],
       });
     });
   },

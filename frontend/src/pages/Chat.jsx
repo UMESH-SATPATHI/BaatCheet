@@ -17,9 +17,10 @@ export default function Chat() {
     getMyChatPartners,
     subscribeToMessages,
     unsubscribeFromMessages,
+    syncOnlineUsers,
   } = useChatStore();
 
-  const { connectSocket } = useAuthStore();
+  const { connectSocket, onlineUsers } = useAuthStore();
 
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
@@ -39,6 +40,10 @@ export default function Chat() {
       unsubscribeFromMessages();
     };
   }, []);
+
+  useEffect(() => {
+    syncOnlineUsers(onlineUsers);
+  }, [onlineUsers, syncOnlineUsers]);
 
   return (
     <div className="flex h-screen w-screen bg-[#121214] text-zinc-100 overflow-hidden select-none">
