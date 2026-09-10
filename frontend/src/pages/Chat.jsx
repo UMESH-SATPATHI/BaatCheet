@@ -1,26 +1,69 @@
+import React, { useEffect, useState } from "react";
+import SidebarNav from "../components/SidebarNav";
+import ChatsSidebar from "../components/ChatsSidebar";
+import ChatArea from "../components/ChatArea";
+import EmptyChatState from "../components/EmptyChatState";
+import ContactsView from "../components/ContactsView";
+import HelpModal from "../components/HelpModal";
+import NewChatModal from "../components/NewChatModal";
+import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
-import { LoaderCircle } from "lucide-react";
 
 export default function Chat() {
-  const authUser = useAuthStore((state) => state.authUser);
-  const logout = useAuthStore((state) => state.logout);
-  const isLoggingOut = useAuthStore((state) => state.isLoggingOut);
+  const {
+    activeTab,
+    selectedUser,
+    getAllContacts,
+    getMyChatPartners,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
+
+  const { connectSocket } = useAuthStore();
+
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isNewChatOpen, setIsNewChatOpen] = useState(false);
+
+  useEffect(() => {
+    // Initial fetch of contacts and chat partners
+    getAllContacts();
+    getMyChatPartners();
+
+    // Connect socket if not connected
+    connectSocket();
+
+    // Subscribe to socket messages
+    subscribeToMessages();
+
+    return () => {
+      unsubscribeFromMessages();
+    };
+  }, []);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-base-200 p-6">
-      <section className="card w-full max-w-md bg-base-100 shadow-xl">
-        <div className="card-body items-center text-center">
-          <h1 className="card-title">Welcome, {authUser.fullName}</h1>
-          <p>Your chat page will go here.</p>
-          <button className="btn btn-error mt-4" onClick={logout} disabled={isLoggingOut}>
-            {isLoggingOut ? (
-              <LoaderCircle className="animate-spin" size={20} aria-label="Logging out" />
-            ) : (
-              "Log out"
-            )}
-          </button>
-        </div>
-      </section>
-    </main>
+    <div className="flex h-screen w-screen bg-[#121214] text-zinc-100 overflow-hidden select-none">
+      {/* 1. Leftmost Navigation Rail */}
+      <SidebarNav />
+
+      {/* 2. Middle Chats Sidebar */}
+      <ChatsSidebar onOpenNewChat={() => setIsNewChatOpen(true)} />
+
+      {/* 3. Main Center Content Area */}
+      {activeTab === "contacts" ? (
+        <ContactsView onOpenHelp={() => setIsHelpOpen(true)} />
+      ) : selectedUser ? (
+        <ChatArea onOpenHelp={() => setIsHelpOpen(true)} />
+      ) : (
+        <EmptyChatState onOpenHelp={() => setIsHelpOpen(true)} />
+      )}
+
+      {/* Modals */}
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <NewChatModal
+        isOpen={isNewChatOpen}
+        onClose={() => setIsNewChatOpen(false)}
+      />
+    </div>
   );
 }
+
