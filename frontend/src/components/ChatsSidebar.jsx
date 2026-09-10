@@ -24,6 +24,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
   } = useChatStore();
 
   const [showMenu, setShowMenu] = useState(false);
+  const [failedProfilePics, setFailedProfilePics] = useState(new Set());
 
   // Filter chats by search query and active tab filter
   const filteredChats = chats.filter((chat) => {
@@ -155,11 +156,17 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                 <div className="relative shrink-0">
                   <div className="w-11 h-11 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
 
-                    {chat.profilePic ? (
+                    {chat.profilePic && !failedProfilePics.has(chat._id) ? (
                       <img
                         src={chat.profilePic}
                         alt={chat.fullName}
                         className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        onError={() =>
+                          setFailedProfilePics((failed) =>
+                            new Set([...failed, chat._id]),
+                          )
+                        }
                       />
                     ) : (
                       chat.initials || "BC"
@@ -185,7 +192,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                       </span>
                     </div>
                     <span className="text-[11px] text-zinc-400 shrink-0 font-medium">
-                      {chat.lastMessageTime || "12:00 PM"}
+                      {chat.lastMessageTime || ""}
                     </span>
                   </div>
 

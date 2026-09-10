@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Search, Users } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 
 export default function ContactsView({ onOpenHelp }) {
+  const [failedProfilePics, setFailedProfilePics] = useState(new Set());
   const {
     allContacts,
     contactSearchQuery,
@@ -67,11 +68,17 @@ export default function ContactsView({ onOpenHelp }) {
               <div className="relative shrink-0">
                 <div className="w-11 h-11 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
 
-                  {contact.profilePic ? (
+                  {contact.profilePic && !failedProfilePics.has(contact._id) ? (
                     <img
                       src={contact.profilePic}
                       alt={contact.fullName}
                       className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                      onError={() =>
+                        setFailedProfilePics((failed) =>
+                          new Set([...failed, contact._id]),
+                        )
+                      }
                     />
                   ) : (
                     contact.initials || "BC"

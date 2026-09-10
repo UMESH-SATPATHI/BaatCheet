@@ -26,6 +26,7 @@ export default function ChatArea({ onOpenHelp }) {
   const [showEmojiMenu, setShowEmojiMenu] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [profileImageFailed, setProfileImageFailed] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -33,6 +34,10 @@ export default function ChatArea({ onOpenHelp }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    setProfileImageFailed(false);
+  }, [selectedUser?._id, selectedUser?.profilePic]);
 
   const handleSendMessage = async (e) => {
     e?.preventDefault();
@@ -85,19 +90,18 @@ export default function ChatArea({ onOpenHelp }) {
           <div className="relative">
             <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
 
-              {selectedUser.profilePic ? (
+              {selectedUser.profilePic && !profileImageFailed ? (
                 <img
                   src={selectedUser.profilePic}
                   alt={selectedUser.fullName}
                   className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={() => setProfileImageFailed(true)}
                 />
               ) : (
                 selectedUser.initials || "PR"
               )}
             </div>
-            {selectedUser.online && (
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#22d3ee] ring-2 ring-[#131316] online-dot" />
-            )}
           </div>
 
           <div className="flex flex-col">
@@ -135,12 +139,6 @@ export default function ChatArea({ onOpenHelp }) {
           </button>
         </div>
       </header>
-
-      {/* Top-Right Purple Accent Bar below header (matching screenshot) */}
-      <div className="flex justify-end w-full pr-0 pointer-events-none">
-        <div className="w-64 h-2.5 bg-gradient-to-r from-[#7c3aed] to-[#9333ea] rounded-l-full shadow-sm" />
-      </div>
-
 
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
