@@ -5,13 +5,16 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+const getFrontendUrl = () =>
+	(process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
+
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 router.get(
 	"/google/callback",
 	passport.authenticate("google", {
-		failureRedirect: `${process.env.FRONTEND_URL}/login`,
+		failureRedirect: `${getFrontendUrl()}/login`,
 	}),
-	(req, res) => res.redirect(`${process.env.FRONTEND_URL}/chat`),
+	(req, res) => res.redirect(`${getFrontendUrl()}/chat`),
 );
 router.post("/logout", logout);
 router.delete("/delete", protectRoute, deleteAccount);

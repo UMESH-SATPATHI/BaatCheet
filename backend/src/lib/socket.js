@@ -5,9 +5,24 @@ import express from "express";
 const app = express();
 const server = http.createServer(app);
 
+const getAllowedOrigins = () => {
+  const envOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(",").map((u) => u.trim().replace(/\/$/, ""))
+    : [];
+  return ["http://localhost:5173", "http://localhost:5174", ...envOrigins].filter(Boolean);
+};
+
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      const allowed = getAllowedOrigins();
+      if (allowed.includes(cleanOrigin) || cleanOrigin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   },
 });
