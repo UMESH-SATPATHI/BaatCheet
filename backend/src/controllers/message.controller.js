@@ -29,9 +29,31 @@ export const getChatPartners = async (req, res) => {
         msg.receiverId.toString() :
         msg.senderId.toString();
     });
-    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+    const uniqueChatPartnerIds = [...new Set(chatPartnerIds)];
+    const chatPartners = await User.find({ _id: { $in: uniqueChatPartnerIds } })
+      .select("-password")
+      .lean();
 
-    res.status(200).json(chatPartners);
+    const chatPartnersWithPreviews = await Promise.all(
+      chatPartners.map(async (chatPartner) => {
+        const latestMessage = await Message.findOne({
+          $or: [
+            { senderId: loggedInUserId, receiverId: chatPartner._id },
+            { senderId: chatPartner._id, receiverId: loggedInUserId },
+          ],
+        })
+          .sort({ createdAt: -1 })
+          .lean();
+
+        return {
+          ...chatPartner,
+          lastMessage: latestMessage?.text || (latestMessage?.image ? "📷 Photo" : ""),
+          lastMessageAt: latestMessage?.createdAt || null,
+        };
+      }),
+    );
+
+    res.status(200).json(chatPartnersWithPreviews);
 
   } catch (error) {
     console.error("Error in getChatPartners controller:", error.message);
@@ -114,7 +136,15 @@ export const sendMessage = async (req, res) => {
     // Real-time socket notification if receiver is online
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newMessage", newMessage);
+      io.to(receiverSocketId).emit("newMessage", {
+        ...newMessage.toObject(),
+        sender: {
+          _id: req.user._id,
+          fullName: req.user.fullName,
+          email: req.user.email,
+          profilePic: req.user.profilePic,
+        },
+      });
     }
 
     res.status(201).json(newMessage);
