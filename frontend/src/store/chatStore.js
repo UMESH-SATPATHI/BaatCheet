@@ -102,7 +102,11 @@ export const useChatStore = create((set, get) => ({
   },
 
   setSelectedUser: (user) => {
-    set({ selectedUser: user });
+    const current = get().selectedUser;
+    if (user && current && String(current._id) === String(user._id)) {
+      return;
+    }
+    set({ selectedUser: user, messages: [] });
     if (user) {
       get().getMessages(user._id);
       // Mark as read in chats list
