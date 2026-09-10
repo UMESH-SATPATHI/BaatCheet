@@ -71,42 +71,6 @@ export default function ChatsSidebar({ onOpenNewChat }) {
             >
               <Plus className="w-5 h-5" />
             </button>
-
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              title="More options"
-              className="w-8 h-8 rounded-xl bg-[#24242c] hover:bg-[#2d2d38] text-zinc-300 flex items-center justify-center transition cursor-pointer"
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-
-            {/* Options Dropdown */}
-            {showMenu && (
-              <div
-                className="absolute right-0 top-10 w-48 bg-[#1f1f28] border border-zinc-800 rounded-xl shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
-                onMouseLeave={() => setShowMenu(false)}
-              >
-                <button
-                  onClick={() => {
-                    setActiveFilter("unread");
-                    setShowMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-xs text-zinc-300 hover:bg-[#272733] hover:text-white transition flex items-center justify-between"
-                >
-                  <span>Filter unread</span>
-                  <Check className="w-3.5 h-3.5 text-[#8b5cf6]" />
-                </button>
-                <button
-                  onClick={() => {
-                    setActiveTab("contacts");
-                    setShowMenu(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-xs text-zinc-300 hover:bg-[#272733] hover:text-white transition flex items-center justify-between"
-                >
-                  <span>View all contacts</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
 

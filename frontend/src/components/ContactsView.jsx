@@ -29,7 +29,7 @@ export default function ContactsView({ onOpenHelp }) {
         <h1 className="text-xl font-bold text-white tracking-tight">Contacts</h1>
 
         {/* Search Contacts input */}
-        <div className="mt-4 bg-[#24242c] rounded-2xl flex items-center px-4 py-3 gap-3 border border-transparent focus-within:border-[#8b5cf6]/50 transition shadow-sm">
+        <div className="mt-4 bg-[#24242c] rounded-4xl flex items-center px-4 py-3 gap-3 border border-transparent focus-within:border-[#8b5cf6]/50 transition shadow-sm">
           <Search className="w-4 h-4 text-zinc-400 shrink-0" />
           <input
             type="text"
