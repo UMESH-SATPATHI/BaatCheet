@@ -19,7 +19,7 @@ import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
 
 export default function ChatArea({ onOpenHelp }) {
-  const { selectedUser, messages, sendMessage, addReaction } = useChatStore();
+  const { selectedUser, messages, sendMessage, addReaction, isMessageLoading } = useChatStore();
   const { authUser } = useAuthStore();
 
   const [inputMessage, setInputMessage] = useState("");
@@ -141,110 +141,146 @@ export default function ChatArea({ onOpenHelp }) {
       </header>
 
       {/* Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-4">
-        {/* Date Divider Pill */}
-        <div className="flex justify-center my-1">
-          <span className="bg-[#202028] text-zinc-400 text-[11px] font-medium px-3.5 py-1 rounded-full shadow-sm">
-            Today
-          </span>
-        </div>
-
-        {/* Message Items */}
-        {messages.map((msg) => {
-          const isMe = msg.senderId === "me" || msg.senderId === authUser?._id;
-
-          return (
-            <div
-              key={msg._id}
-              className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
-            >
-              {/* Outgoing Message */}
-              {isMe ? (
-                <div className="flex flex-col items-end max-w-[65%]">
-                  {/* Image Attachment Preview */}
-                  {msg.image && (
-                    <div className="rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm">
-                      <img
-                        src={msg.image}
-                        alt="attachment"
-                        className="w-full h-auto object-cover max-h-72 rounded-2xl"
-                      />
-                    </div>
-                  )}
-
-                  {/* Document / File Card */}
-                  {msg.file && (
-                    <div className="bg-[#8b5cf6] p-3 rounded-2xl flex items-center gap-3 text-white shadow-md shadow-purple-950/40 mb-1 min-w-[220px]">
-                      <div className="w-10 h-10 rounded-xl bg-purple-950/40 flex items-center justify-center shrink-0">
-                        <FileText className="w-5 h-5 text-white" />
-                      </div>
-                      <div className="flex flex-col min-w-0 pr-2">
-                        <span className="font-semibold text-xs text-white truncate">
-                          {msg.file.name || "Document.pdf"}
-                        </span>
-                        <span className="text-[10px] text-purple-200">
-                          {msg.file.size || "2.4 MB"}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Text Message Bubble */}
-                  {msg.text && (
-                    <div className="bg-[#8b5cf6] text-white px-4 py-2.5 rounded-2xl rounded-tr-sm text-xs leading-relaxed shadow-md shadow-purple-950/30">
-                      {msg.text}
-                    </div>
-                  )}
-
-                  {/* Outgoing Timestamp & Cyan Double Checkmark */}
-                  <div className="flex items-center gap-1 mt-1 pr-1">
-                    <span className="text-[10px] text-zinc-500 font-medium">
-                      {msg.displayTime || "12:00 PM"}
-                    </span>
-                    <CheckCheck className="w-3.5 h-3.5 text-[#22d3ee]" />
-                  </div>
-                </div>
-              ) : (
-                /* Incoming Message */
-                <div className="flex flex-col items-start max-w-[65%]">
-                  {/* Incoming Image */}
-                  {msg.image && (
-                    <div className="rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm">
-                      <img
-                        src={msg.image}
-                        alt="attachment"
-                        className="w-full h-auto object-cover max-h-72 rounded-2xl"
-                      />
-                    </div>
-                  )}
-
-                  {/* Incoming Text Bubble */}
-                  {msg.text && (
-                    <div className="bg-[#24242a] text-zinc-100 px-4 py-2.5 rounded-2xl rounded-tl-sm text-xs leading-relaxed shadow-sm">
-                      {msg.text}
-                    </div>
-                  )}
-
-                  {/* Reactions Pill */}
-                  {msg.reactions && msg.reactions.length > 0 && (
-                    <div className="mt-1 bg-[#202028] border border-zinc-700/60 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                      {msg.reactions.map((emoji, i) => (
-                        <span key={i} className="text-xs leading-none">
-                          {emoji}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Incoming Timestamp */}
-                  <span className="text-[10px] text-zinc-500 mt-1 pl-1 font-medium">
-                    {msg.displayTime || "12:00 PM"}
-                  </span>
-                </div>
-              )}
+      <div className="flex-1 overflow-y-auto px-6 py-4 flex flex-col gap-3">
+        {/* Loading state with bouncy dots and bubble skeletons */}
+        {isMessageLoading ? (
+          <div className="flex-1 flex flex-col justify-end gap-3.5 py-4">
+            <div className="flex justify-center items-center gap-1.5 py-2">
+              <span className="w-2 h-2 rounded-full bg-[#8b5cf6] bouncing-dot-1" />
+              <span className="w-2 h-2 rounded-full bg-[#8b5cf6] bouncing-dot-2" />
+              <span className="w-2 h-2 rounded-full bg-[#8b5cf6] bouncing-dot-3" />
             </div>
-          );
-        })}
+            {/* Incoming skeleton bubble */}
+            <div className="flex flex-col items-start max-w-[50%]">
+              <div className="w-48 h-9 rounded-2xl rounded-tl-sm bg-[#22222a] skeleton-bouncy" />
+            </div>
+            {/* Outgoing skeleton bubble */}
+            <div className="flex flex-col items-end max-w-[60%] self-end">
+              <div className="w-56 h-10 rounded-2xl rounded-tr-sm bg-[#8b5cf6]/30 skeleton-bouncy" />
+            </div>
+            {/* Incoming skeleton bubble */}
+            <div className="flex flex-col items-start max-w-[45%]">
+              <div className="w-36 h-9 rounded-2xl rounded-tl-sm bg-[#22222a] skeleton-bouncy" />
+            </div>
+            {/* Outgoing skeleton bubble */}
+            <div className="flex flex-col items-end max-w-[55%] self-end">
+              <div className="w-52 h-10 rounded-2xl rounded-tr-sm bg-[#8b5cf6]/30 skeleton-bouncy" />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Date Divider Pill */}
+            <div className="flex justify-center my-1 sticky top-0 z-10 pointer-events-none">
+              <span className="bg-[#202028]/90 backdrop-blur-xs text-zinc-400 text-[11px] font-medium px-3.5 py-1 rounded-full shadow-sm border border-zinc-800/60">
+                Today
+              </span>
+            </div>
+
+            {/* Message Items */}
+            {messages.map((msg) => {
+              const isMe = msg.senderId === "me" || msg.senderId === authUser?._id;
+
+              return (
+                <div
+                  key={msg._id}
+                  className={`flex flex-col ${
+                    isMe ? "items-end animate-message-right" : "items-start animate-message-left"
+                  }`}
+                >
+                  {/* Outgoing Message */}
+                  {isMe ? (
+                    <div className="flex flex-col items-end max-w-[70%]">
+                      {/* Image Attachment Preview */}
+                      {msg.image && (
+                        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group">
+                          <img
+                            src={msg.image}
+                            alt="attachment"
+                            className="w-full h-auto object-cover max-h-72 rounded-2xl"
+                          />
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                            <CheckCheck className="w-3 h-3 text-[#22d3ee]" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Document / File Card */}
+                      {msg.file && (
+                        <div className="bg-[#8b5cf6] p-3 rounded-2xl flex items-center gap-3 text-white shadow-md shadow-purple-950/40 mb-1 min-w-[230px] relative pb-5">
+                          <div className="w-10 h-10 rounded-xl bg-purple-950/40 flex items-center justify-center shrink-0">
+                            <FileText className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex flex-col min-w-0 pr-2">
+                            <span className="font-semibold text-xs text-white truncate">
+                              {msg.file.name || "Document.pdf"}
+                            </span>
+                            <span className="text-[10px] text-purple-200">
+                              {msg.file.size || "2.4 MB"}
+                            </span>
+                          </div>
+                          <div className="absolute bottom-1.5 right-2.5 flex items-center gap-1 text-[10px] text-purple-200 font-medium select-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                            <CheckCheck className="w-3 h-3 text-[#22d3ee]" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Text Message Bubble with Integrated Time Label */}
+                      {msg.text && (
+                        <div className="bg-[#8b5cf6] text-white px-3.5 py-2 rounded-2xl rounded-tr-sm text-xs leading-relaxed shadow-md shadow-purple-950/30 max-w-full overflow-hidden">
+                          <span className="break-words select-text">{msg.text}</span>
+                          <span className="float-right inline-flex items-center gap-1 pl-2.5 pt-1 text-[10px] text-purple-200/90 font-medium select-none pointer-events-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                            <CheckCheck className="w-3 h-3 text-[#22d3ee]" />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* Incoming Message */
+                    <div className="flex flex-col items-start max-w-[70%]">
+                      {/* Incoming Image */}
+                      {msg.image && (
+                        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group">
+                          <img
+                            src={msg.image}
+                            alt="attachment"
+                            className="w-full h-auto object-cover max-h-72 rounded-2xl"
+                          />
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Incoming Text Bubble with Integrated Time Label */}
+                      {msg.text && (
+                        <div className="bg-[#24242a] text-zinc-100 px-3.5 py-2 rounded-2xl rounded-tl-sm text-xs leading-relaxed shadow-sm max-w-full overflow-hidden border border-zinc-800/40">
+                          <span className="break-words select-text">{msg.text}</span>
+                          <span className="float-right inline-flex items-center pl-2.5 pt-1 text-[10px] text-zinc-400 font-medium select-none pointer-events-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Reactions Pill */}
+                      {msg.reactions && msg.reactions.length > 0 && (
+                        <div className="mt-1 bg-[#202028] border border-zinc-700/60 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+                          {msg.reactions.map((emoji, i) => (
+                            <span key={i} className="text-xs leading-none">
+                              {emoji}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
 
         <div ref={messagesEndRef} />
       </div>
