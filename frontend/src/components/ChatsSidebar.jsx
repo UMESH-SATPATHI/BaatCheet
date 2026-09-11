@@ -219,11 +219,6 @@ export default function ChatsSidebar({ onOpenNewChat }) {
           })
         )}
       </div>
-
-      {/* Bottom Pinned Profile Header */}
-      <div className="p-2.5 border-t border-[#22222b] bg-[#141418] shrink-0 pb-safe">
-        <ProfileHeader />
-      </div>
     </aside>
   );
 }
