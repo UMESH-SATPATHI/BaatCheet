@@ -53,6 +53,13 @@ export const getChatPartners = async (req, res) => {
       }),
     );
 
+    // Sort conversations with the most recent message at the top
+    chatPartnersWithPreviews.sort((a, b) => {
+      const timeA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+      const timeB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+      return timeB - timeA;
+    });
+
     res.status(200).json(chatPartnersWithPreviews);
 
   } catch (error) {

@@ -112,7 +112,7 @@ export const useChatStore = create((set, get) => ({
       // Mark as read in chats list
       set((state) => ({
         chats: state.chats.map((c) =>
-          c._id === user._id ? { ...c, unreadCount: 0 } : c
+          String(c._id) === String(user._id) ? { ...c, unreadCount: 0 } : c
         ),
       }));
     }
@@ -164,16 +164,23 @@ export const useChatStore = create((set, get) => ({
             initials: getInitials(c.fullName),
             online,
             statusText: online ? "online" : "offline",
-            unreadCount: 0,
+            unreadCount: c.unreadCount || 0,
             lastMessage: c.lastMessage || "",
             lastMessageTime: formatTime(c.lastMessageAt),
           };
         });
+
+        // Ensure chats are sorted by latest message descending
+        formatted.sort((a, b) => {
+          const timeA = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+          const timeB = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+          return timeB - timeA;
+        });
+
         set({ chats: formatted });
       } else {
         set({ chats: [] });
       }
-
     } catch (error) {
       console.log("No chat partners loaded:", error.message);
       set({ chats: [] });
@@ -204,17 +211,18 @@ export const useChatStore = create((set, get) => ({
   },
 
   sendMessage: async (messageData) => {
-    const { selectedUser, messages, isSoundEnabled, chats } = get();
+    const { selectedUser, messages, isSoundEnabled } = get();
     if (!selectedUser) return;
 
     const myUser = useAuthStore.getState().authUser;
     const now = new Date();
     const displayTime = formatTime(now);
+    const targetId = String(selectedUser._id);
 
     const tempMessage = {
       _id: "temp_" + Date.now(),
       senderId: myUser?._id || "me",
-      receiverId: selectedUser._id,
+      receiverId: targetId,
       text: messageData.text || "",
       image: messageData.image || null,
       file: messageData.file || null,
@@ -227,24 +235,29 @@ export const useChatStore = create((set, get) => ({
     const updatedMessages = [...messages, tempMessage];
     const chatPreview =
       messageData.text || (messageData.image ? "📷 Photo" : "📎 File");
-    const existingChat = chats.some((chat) => chat._id === selectedUser._id);
+
+    const currentChats = get().chats;
+    const existing = currentChats.find((c) => String(c._id) === targetId);
+
     const updatedChat = {
       ...selectedUser,
+      ...(existing || {}),
+      _id: targetId,
       lastMessage: chatPreview,
       lastMessageTime: displayTime,
+      lastMessageAt: now.toISOString(),
       online: selectedUser.online || false,
       unreadCount: 0,
     };
 
+    // Deduplicate and move to top of chats list
+    const remainingChats = currentChats.filter(
+      (c) => String(c._id) !== targetId
+    );
+
     set({
       messages: updatedMessages,
-      chats: existingChat
-        ? chats.map((chat) =>
-            chat._id === selectedUser._id
-              ? { ...chat, ...updatedChat }
-              : chat,
-          )
-        : [updatedChat, ...chats],
+      chats: [updatedChat, ...remainingChats],
     });
 
     if (isSoundEnabled) {
@@ -256,7 +269,19 @@ export const useChatStore = create((set, get) => ({
         text: messageData.text,
         image: messageData.image,
       };
-      await axiosInstance.post(`/messages/send/${selectedUser._id}`, payload);
+      const response = await axiosInstance.post(`/messages/send/${targetId}`, payload);
+      if (response.data) {
+        set((state) => ({
+          messages: state.messages.map((m) =>
+            m._id === tempMessage._id
+              ? {
+                  ...response.data,
+                  displayTime: formatTime(response.data.createdAt),
+                }
+              : m
+          ),
+        }));
+      }
     } catch (error) {
       console.log("Error sending message to server:", error.message);
     }
@@ -282,8 +307,11 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
     if (!socket) return;
 
+    // Prevent duplicate event listeners
+    socket.off("newMessage");
+
     socket.on("newMessage", (newMessage) => {
-      const { selectedUser, isSoundEnabled, chats } = get();
+      const { selectedUser, isSoundEnabled } = get();
 
       if (isSoundEnabled) {
         playBeep(520, 0.1, "sine");
@@ -291,39 +319,66 @@ export const useChatStore = create((set, get) => ({
 
       const senderId = String(newMessage.senderId);
       const selectedUserId = selectedUser ? String(selectedUser._id) : null;
+      const formattedTime = formatTime(newMessage.createdAt || new Date());
+      const previewText =
+        newMessage.text || (newMessage.image ? "📷 Photo" : "📎 File");
 
-      if (selectedUser && senderId === selectedUserId) {
+      // 1. If currently chatting with this user, append message to the open conversation
+      if (selectedUserId && senderId === selectedUserId) {
         const formatted = {
           ...newMessage,
-          displayTime: formatTime(newMessage.createdAt),
+          displayTime: formattedTime,
         };
-        set({ messages: [...get().messages, formatted] });
+        set((state) => ({ messages: [...state.messages, formatted] }));
       }
 
+      // 2. Real-time update sidebar: update preview, time, and move chat to the TOP
+      const currentChats = get().chats;
       const contact = get().allContacts.find(
         (candidate) => String(candidate._id) === senderId,
       );
-      const existingChat = chats.find((chat) => String(chat._id) === senderId);
-      const chatUpdate = {
-        ...(existingChat || contact || newMessage.sender || { _id: senderId }),
+      const existingChat = currentChats.find(
+        (chat) => String(chat._id) === senderId,
+      );
+
+      const updatedChat = {
+        ...(contact || {}),
+        ...(existingChat || {}),
         ...(newMessage.sender || {}),
         _id: senderId,
+        fullName:
+          newMessage.sender?.fullName ||
+          existingChat?.fullName ||
+          contact?.fullName ||
+          "User",
+        profilePic:
+          newMessage.sender?.profilePic ||
+          existingChat?.profilePic ||
+          contact?.profilePic ||
+          "",
         initials: getInitials(
-          newMessage.sender?.fullName || contact?.fullName || existingChat?.fullName,
+          newMessage.sender?.fullName ||
+            existingChat?.fullName ||
+            contact?.fullName,
         ),
-        lastMessage: newMessage.text || (newMessage.image ? "📷 Photo" : "📎 File"),
-        lastMessageTime: formatTime(newMessage.createdAt),
+        lastMessage: previewText,
+        lastMessageTime: formattedTime,
+        lastMessageAt: newMessage.createdAt || new Date().toISOString(),
         online: true,
         statusText: "online",
-        unreadCount: selectedUserId === senderId ? 0 : (existingChat?.unreadCount || 0) + 1,
+        unreadCount:
+          selectedUserId === senderId
+            ? 0
+            : (existingChat?.unreadCount || 0) + 1,
       };
 
+      // Filter out any previous instance of this chat and prepend to index 0
+      const remainingChats = currentChats.filter(
+        (chat) => String(chat._id) !== senderId,
+      );
+
       set({
-        chats: existingChat
-          ? chats.map((chat) =>
-              String(chat._id) === senderId ? { ...chat, ...chatUpdate } : chat,
-            )
-          : [chatUpdate, ...chats],
+        chats: [updatedChat, ...remainingChats],
       });
     });
   },

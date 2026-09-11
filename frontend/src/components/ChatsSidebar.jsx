@@ -137,7 +137,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
           </div>
         ) : (
           filteredChats.map((chat) => {
-            const isSelected = selectedUser?._id === chat._id;
+            const isSelected = String(selectedUser?._id) === String(chat._id);
             return (
               <div
                 key={chat._id}
