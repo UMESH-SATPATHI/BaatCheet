@@ -18,6 +18,21 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    video: {
+      type: String,
+    },
+    fileUrl: {
+      type: String,
+    },
+    fileName: {
+      type: String,
+    },
+    fileSize: {
+      type: String,
+    },
+    fileType: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

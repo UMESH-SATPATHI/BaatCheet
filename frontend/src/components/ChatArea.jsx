@@ -14,10 +14,19 @@ import {
   Heart,
   Flame,
   ArrowLeft,
+  Download,
+  Eye,
+  Maximize2,
+  FileArchive,
+  FileSpreadsheet,
+  File,
+  Play,
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
+import MediaPreviewModal from "./MediaPreviewModal";
+import { downloadMedia, formatFileSize, getMediaType } from "../lib/downloadHelper";
 
 export default function ChatArea({ onOpenHelp }) {
   const { selectedUser, setSelectedUser, messages, sendMessage, addReaction, isMessageLoading } = useChatStore();
@@ -27,6 +36,8 @@ export default function ChatArea({ onOpenHelp }) {
   const [showEmojiMenu, setShowEmojiMenu] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [previewVideo, setPreviewVideo] = useState(null);
+  const [previewMedia, setPreviewMedia] = useState(null);
   const [profileImageFailed, setProfileImageFailed] = useState(false);
   const messagesContainerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -47,16 +58,21 @@ export default function ChatArea({ onOpenHelp }) {
 
   const handleSendMessage = async (e) => {
     e?.preventDefault();
-    if (!inputMessage.trim() && !previewImage && !selectedFile) return;
+    if (!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile) return;
 
     const payload = {
       text: inputMessage.trim(),
       image: previewImage || null,
-      file: selectedFile || null,
+      video: previewVideo || null,
+      file: selectedFile?.dataUrl || null,
+      fileName: selectedFile?.name || null,
+      fileSize: selectedFile?.size || null,
+      fileType: selectedFile?.type || null,
     };
 
     setInputMessage("");
     setPreviewImage(null);
+    setPreviewVideo(null);
     setSelectedFile(null);
     setShowEmojiMenu(false);
 
@@ -67,20 +83,54 @@ export default function ChatArea({ onOpenHelp }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-        setSelectedFile(null);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setSelectedFile({
-        name: file.name,
-        size: (file.size / (1024 * 1024)).toFixed(1) + " MB",
-      });
-      setPreviewImage(null);
-    }
+    const mediaType = getMediaType(file);
+    const formattedSize = formatFileSize(file.size);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const dataUrl = reader.result;
+
+      if (mediaType === "image") {
+        setPreviewImage(dataUrl);
+        setPreviewVideo(null);
+        setSelectedFile({
+          name: file.name,
+          size: formattedSize,
+          type: file.type,
+          dataUrl,
+        });
+      } else if (mediaType === "video") {
+        setPreviewVideo(dataUrl);
+        setPreviewImage(null);
+        setSelectedFile({
+          name: file.name,
+          size: formattedSize,
+          type: file.type,
+          dataUrl,
+        });
+      } else {
+        setSelectedFile({
+          name: file.name,
+          size: formattedSize,
+          type: file.type,
+          dataUrl,
+        });
+        setPreviewImage(null);
+        setPreviewVideo(null);
+      }
+    };
+
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const getDocumentIcon = (name, className = "w-5 h-5") => {
+    const type = getMediaType(name);
+    if (type === "pdf") return <FileText className={`${className} text-red-400`} />;
+    if (type === "doc") return <FileText className={`${className} text-blue-400`} />;
+    if (type === "sheet") return <FileSpreadsheet className={`${className} text-emerald-400`} />;
+    if (type === "archive") return <FileArchive className={`${className} text-amber-400`} />;
+    return <File className={`${className} text-purple-300`} />;
   };
 
   const quickEmojis = ["💜", "✨", "😂", "👍", "❤️", "🔥", "🎨", "🎉"];
@@ -219,9 +269,89 @@ export default function ChatArea({ onOpenHelp }) {
                           <img
                             src={msg.image}
                             alt="attachment"
-                            className="w-full h-auto object-cover max-h-72 rounded-2xl"
+                            onClick={() =>
+                              setPreviewMedia({
+                                type: "image",
+                                url: msg.image,
+                                name: msg.fileName || "Photo.jpg",
+                                size: msg.fileSize,
+                              })
+                            }
+                            className="w-full h-auto object-cover max-h-72 rounded-2xl cursor-pointer hover:brightness-105 transition"
                           />
-                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md">
+                          {/* Top-right overlay actions */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 bg-black/65 backdrop-blur-md p-1 rounded-xl shadow-lg border border-white/10 z-10">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewMedia({
+                                  type: "image",
+                                  url: msg.image,
+                                  name: msg.fileName || "Photo.jpg",
+                                  size: msg.fileSize,
+                                });
+                              }}
+                              title="Preview image"
+                              className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadMedia(msg.image, msg.fileName || "Photo.jpg");
+                              }}
+                              title="Download image"
+                              className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer shadow-md"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md pointer-events-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                            <CheckCheck className="w-3 h-3 text-[#22d3ee]" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Video Attachment Preview */}
+                      {msg.video && (
+                        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group bg-black">
+                          <video
+                            src={msg.video}
+                            controls
+                            playsInline
+                            className="w-full h-auto max-h-72 rounded-2xl"
+                          />
+                          {/* Top-right overlay actions */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 bg-black/65 backdrop-blur-md p-1 rounded-xl shadow-lg border border-white/10 z-10">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPreviewMedia({
+                                  type: "video",
+                                  url: msg.video,
+                                  name: msg.fileName || "Video.mp4",
+                                  size: msg.fileSize,
+                                })
+                              }
+                              title="Fullscreen theater"
+                              className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => downloadMedia(msg.video, msg.fileName || "Video.mp4")}
+                              title="Download video"
+                              className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer shadow-md"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md pointer-events-none">
                             <span>{msg.displayTime || "12:00 PM"}</span>
                             <CheckCheck className="w-3 h-3 text-[#22d3ee]" />
                           </div>
@@ -229,18 +359,49 @@ export default function ChatArea({ onOpenHelp }) {
                       )}
 
                       {/* Document / File Card */}
-                      {msg.file && (
-                        <div className="bg-[#8b5cf6] p-3 rounded-2xl flex items-center gap-3 text-white shadow-md shadow-purple-950/40 mb-1 min-w-[230px] relative pb-5">
+                      {(msg.fileUrl || msg.file) && (
+                        <div className="bg-[#8b5cf6] p-3 rounded-2xl flex items-center gap-3 text-white shadow-md shadow-purple-950/40 mb-1 min-w-[240px] max-w-sm relative pb-6 group">
                           <div className="w-10 h-10 rounded-xl bg-purple-950/40 flex items-center justify-center shrink-0">
-                            <FileText className="w-5 h-5 text-white" />
+                            {getDocumentIcon(msg.fileName || msg.file?.name)}
                           </div>
-                          <div className="flex flex-col min-w-0 pr-2">
-                            <span className="font-semibold text-xs text-white truncate">
-                              {msg.file.name || "Document.pdf"}
+                          <div className="flex flex-col min-w-0 flex-1 pr-1">
+                            <span className="font-semibold text-xs text-white truncate" title={msg.fileName || msg.file?.name || "Document"}>
+                              {msg.fileName || msg.file?.name || "Document"}
                             </span>
                             <span className="text-[10px] text-purple-200">
-                              {msg.file.size || "2.4 MB"}
+                              {msg.fileSize || msg.file?.size || "Attachment"}
                             </span>
+                          </div>
+                          {/* Preview & Download action buttons */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPreviewMedia({
+                                  type: getMediaType(msg.fileName || msg.file?.name),
+                                  url: msg.fileUrl || msg.file?.dataUrl || msg.file,
+                                  name: msg.fileName || msg.file?.name || "Document",
+                                  size: msg.fileSize || msg.file?.size,
+                                })
+                              }
+                              title="Preview document"
+                              className="w-7 h-7 rounded-lg bg-purple-900/50 hover:bg-purple-900/80 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadMedia(
+                                  msg.fileUrl || msg.file?.dataUrl || msg.file,
+                                  msg.fileName || msg.file?.name || "Document"
+                                )
+                              }
+                              title="Download document"
+                              className="w-7 h-7 rounded-lg bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                           <div className="absolute bottom-1.5 right-2.5 flex items-center gap-1 text-[10px] text-purple-200 font-medium select-none">
                             <span>{msg.displayTime || "12:00 PM"}</span>
@@ -269,9 +430,139 @@ export default function ChatArea({ onOpenHelp }) {
                           <img
                             src={msg.image}
                             alt="attachment"
-                            className="w-full h-auto object-cover max-h-72 rounded-2xl"
+                            onClick={() =>
+                              setPreviewMedia({
+                                type: "image",
+                                url: msg.image,
+                                name: msg.fileName || "Photo.jpg",
+                                size: msg.fileSize,
+                              })
+                            }
+                            className="w-full h-auto object-cover max-h-72 rounded-2xl cursor-pointer hover:brightness-105 transition"
                           />
-                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md">
+                          {/* Top-right overlay actions */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 bg-black/65 backdrop-blur-md p-1 rounded-xl shadow-lg border border-white/10 z-10">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewMedia({
+                                  type: "image",
+                                  url: msg.image,
+                                  name: msg.fileName || "Photo.jpg",
+                                  size: msg.fileSize,
+                                });
+                              }}
+                              title="Preview image"
+                              className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadMedia(msg.image, msg.fileName || "Photo.jpg");
+                              }}
+                              title="Download image"
+                              className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer shadow-md"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md pointer-events-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Incoming Video */}
+                      {msg.video && (
+                        <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group bg-black">
+                          <video
+                            src={msg.video}
+                            controls
+                            playsInline
+                            className="w-full h-auto max-h-72 rounded-2xl"
+                          />
+                          {/* Top-right overlay actions */}
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 bg-black/65 backdrop-blur-md p-1 rounded-xl shadow-lg border border-white/10 z-10">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPreviewMedia({
+                                  type: "video",
+                                  url: msg.video,
+                                  name: msg.fileName || "Video.mp4",
+                                  size: msg.fileSize,
+                                })
+                              }
+                              title="Fullscreen theater"
+                              className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => downloadMedia(msg.video, msg.fileName || "Video.mp4")}
+                              title="Download video"
+                              className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer shadow-md"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-black/65 backdrop-blur-xs flex items-center gap-1 text-[10px] text-white font-medium select-none shadow-md pointer-events-none">
+                            <span>{msg.displayTime || "12:00 PM"}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Incoming Document / File */}
+                      {(msg.fileUrl || msg.file) && (
+                        <div className="bg-[#24242a] border border-zinc-800/80 p-3 rounded-2xl flex items-center gap-3 text-zinc-100 shadow-md mb-1 min-w-[240px] max-w-sm relative pb-6 group">
+                          <div className="w-10 h-10 rounded-xl bg-zinc-800/90 flex items-center justify-center shrink-0 border border-zinc-700/50">
+                            {getDocumentIcon(msg.fileName || msg.file?.name)}
+                          </div>
+                          <div className="flex flex-col min-w-0 flex-1 pr-1">
+                            <span className="font-semibold text-xs text-white truncate" title={msg.fileName || msg.file?.name || "Document"}>
+                              {msg.fileName || msg.file?.name || "Document"}
+                            </span>
+                            <span className="text-[10px] text-zinc-400">
+                              {msg.fileSize || msg.file?.size || "Attachment"}
+                            </span>
+                          </div>
+                          {/* Preview & Download action buttons */}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPreviewMedia({
+                                  type: getMediaType(msg.fileName || msg.file?.name),
+                                  url: msg.fileUrl || msg.file?.dataUrl || msg.file,
+                                  name: msg.fileName || msg.file?.name || "Document",
+                                  size: msg.fileSize || msg.file?.size,
+                                })
+                              }
+                              title="Preview document"
+                              className="w-7 h-7 rounded-lg bg-zinc-700/60 hover:bg-zinc-700 text-zinc-200 flex items-center justify-center transition cursor-pointer"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                downloadMedia(
+                                  msg.fileUrl || msg.file?.dataUrl || msg.file,
+                                  msg.fileName || msg.file?.name || "Document"
+                                )
+                              }
+                              title="Download document"
+                              className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer shadow-sm"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          <div className="absolute bottom-1.5 right-2.5 flex items-center gap-1 text-[10px] text-zinc-400 font-medium select-none">
                             <span>{msg.displayTime || "12:00 PM"}</span>
                           </div>
                         </div>
@@ -307,23 +598,57 @@ export default function ChatArea({ onOpenHelp }) {
       </div>
 
       {/* Attachment / File Preview Bar */}
-      {(previewImage || selectedFile) && (
-        <div className="mx-6 p-2.5 bg-[#1c1c24] border border-zinc-800 rounded-2xl flex items-center justify-between mb-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
-          <div className="flex items-center gap-3">
+      {(previewImage || previewVideo || selectedFile) && (
+        <div className="mx-3 sm:mx-6 p-2.5 bg-[#1c1c24] border border-zinc-800 rounded-2xl flex items-center justify-between mb-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+          <div className="flex items-center gap-3 min-w-0">
             {previewImage ? (
               <img
                 src={previewImage}
                 alt="Preview"
-                className="w-12 h-12 rounded-xl object-cover border border-zinc-700"
+                onClick={() =>
+                  setPreviewMedia({
+                    type: "image",
+                    url: previewImage,
+                    name: selectedFile?.name || "Photo.jpg",
+                    size: selectedFile?.size,
+                  })
+                }
+                className="w-12 h-12 rounded-xl object-cover border border-zinc-700 cursor-pointer hover:opacity-80 transition shrink-0"
               />
+            ) : previewVideo ? (
+              <div
+                onClick={() =>
+                  setPreviewMedia({
+                    type: "video",
+                    url: previewVideo,
+                    name: selectedFile?.name || "Video.mp4",
+                    size: selectedFile?.size,
+                  })
+                }
+                className="w-12 h-12 rounded-xl bg-cyan-950/40 border border-cyan-700/40 flex items-center justify-center cursor-pointer hover:opacity-80 transition shrink-0 text-cyan-400"
+              >
+                <Video className="w-5 h-5" />
+              </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-purple-900/50 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-purple-300" />
+              <div
+                onClick={() => {
+                  if (selectedFile?.dataUrl) {
+                    setPreviewMedia({
+                      type: getMediaType(selectedFile.name),
+                      url: selectedFile.dataUrl,
+                      name: selectedFile.name,
+                      size: selectedFile.size,
+                    });
+                  }
+                }}
+                className="w-12 h-12 rounded-xl bg-purple-900/40 border border-purple-700/40 flex items-center justify-center cursor-pointer hover:opacity-80 transition shrink-0"
+              >
+                {getDocumentIcon(selectedFile?.name, "w-6 h-6")}
               </div>
             )}
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold text-white">
-                {selectedFile?.name || "Image ready to send"}
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-semibold text-white truncate">
+                {selectedFile?.name || (previewImage ? "Image ready to send" : previewVideo ? "Video ready to send" : "File ready to send")}
               </span>
               <span className="text-[10px] text-zinc-400">
                 {selectedFile?.size || "Click send to upload"}
@@ -331,15 +656,42 @@ export default function ChatArea({ onOpenHelp }) {
             </div>
           </div>
 
-          <button
-            onClick={() => {
-              setPreviewImage(null);
-              setSelectedFile(null);
-            }}
-            className="w-7 h-7 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
+            {/* Quick Preview button */}
+            <button
+              type="button"
+              onClick={() => {
+                const targetUrl = previewImage || previewVideo || selectedFile?.dataUrl;
+                if (targetUrl) {
+                  setPreviewMedia({
+                    type: previewImage ? "image" : previewVideo ? "video" : getMediaType(selectedFile?.name),
+                    url: targetUrl,
+                    name: selectedFile?.name || (previewImage ? "Photo.jpg" : previewVideo ? "Video.mp4" : "Attachment"),
+                    size: selectedFile?.size,
+                  });
+                }
+              }}
+              title="Preview attachment"
+              className="px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-medium flex items-center gap-1 transition cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Preview</span>
+            </button>
+
+            {/* Remove button */}
+            <button
+              type="button"
+              onClick={() => {
+                setPreviewImage(null);
+                setPreviewVideo(null);
+                setSelectedFile(null);
+              }}
+              title="Remove attachment"
+              className="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
 
@@ -369,7 +721,7 @@ export default function ChatArea({ onOpenHelp }) {
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
-          accept="image/*,.pdf,.doc,.docx,.zip"
+          accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar,.tar,.mp3,.wav"
         />
 
         {/* Input Wrapper Container */}
@@ -391,7 +743,7 @@ export default function ChatArea({ onOpenHelp }) {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="Attach file or photo"
+            title="Attach file, photo or video"
             className="text-zinc-400 hover:text-purple-400 hover:scale-115 active:scale-90 transition-all duration-200 cursor-pointer shrink-0"
           >
             <Paperclip className="w-5 h-5" />
@@ -409,10 +761,10 @@ export default function ChatArea({ onOpenHelp }) {
           {/* Send Button */}
           <button
             type="submit"
-            disabled={!inputMessage.trim() && !previewImage && !selectedFile}
+            disabled={!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile}
             title="Send message"
             className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
-              inputMessage.trim() || previewImage || selectedFile
+              inputMessage.trim() || previewImage || previewVideo || selectedFile
                 ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white shadow-md shadow-purple-900/40 hover:shadow-purple-500/50 hover:scale-110 active:scale-95"
                 : "text-zinc-600 hover:text-zinc-500 cursor-not-allowed"
             }`}
@@ -430,6 +782,14 @@ export default function ChatArea({ onOpenHelp }) {
           <span className="text-sm font-semibold">?</span>
         </button>
       </footer>
+
+      {/* Fullscreen Media Preview Modal */}
+      {previewMedia && (
+        <MediaPreviewModal
+          media={previewMedia}
+          onClose={() => setPreviewMedia(null)}
+        />
+      )}
     </main>
   );
 }

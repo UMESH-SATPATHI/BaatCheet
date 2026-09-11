@@ -225,6 +225,11 @@ export const useChatStore = create((set, get) => ({
       receiverId: targetId,
       text: messageData.text || "",
       image: messageData.image || null,
+      video: messageData.video || null,
+      fileUrl: messageData.fileUrl || messageData.file || null,
+      fileName: messageData.fileName || null,
+      fileSize: messageData.fileSize || null,
+      fileType: messageData.fileType || null,
       file: messageData.file || null,
       createdAt: now.toISOString(),
       displayTime,
@@ -234,7 +239,14 @@ export const useChatStore = create((set, get) => ({
     // Optimistic local update
     const updatedMessages = [...messages, tempMessage];
     const chatPreview =
-      messageData.text || (messageData.image ? "📷 Photo" : "📎 File");
+      messageData.text ||
+      (messageData.image
+        ? "📷 Photo"
+        : messageData.video
+        ? "🎥 Video"
+        : messageData.fileName
+        ? `📎 ${messageData.fileName}`
+        : "📎 Attachment");
 
     const currentChats = get().chats;
     const existing = currentChats.find((c) => String(c._id) === targetId);
@@ -268,6 +280,11 @@ export const useChatStore = create((set, get) => ({
       const payload = {
         text: messageData.text,
         image: messageData.image,
+        video: messageData.video,
+        file: messageData.file,
+        fileName: messageData.fileName,
+        fileSize: messageData.fileSize,
+        fileType: messageData.fileType,
       };
       const response = await axiosInstance.post(`/messages/send/${targetId}`, payload);
       if (response.data) {
@@ -320,8 +337,14 @@ export const useChatStore = create((set, get) => ({
       const senderId = String(newMessage.senderId);
       const selectedUserId = selectedUser ? String(selectedUser._id) : null;
       const formattedTime = formatTime(newMessage.createdAt || new Date());
-      const previewText =
-        newMessage.text || (newMessage.image ? "📷 Photo" : "📎 File");
+      let previewText = newMessage.text;
+      if (!previewText) {
+        if (newMessage.image) previewText = "📷 Photo";
+        else if (newMessage.video) previewText = "🎥 Video";
+        else if (newMessage.fileName) previewText = `📎 ${newMessage.fileName}`;
+        else if (newMessage.fileUrl) previewText = "📎 Attachment";
+        else previewText = "Message";
+      }
 
       // 1. If currently chatting with this user, append message to the open conversation
       if (selectedUserId && senderId === selectedUserId) {

@@ -45,9 +45,22 @@ export const getChatPartners = async (req, res) => {
           .sort({ createdAt: -1 })
           .lean();
 
+        let preview = "";
+        if (latestMessage?.text) {
+          preview = latestMessage.text;
+        } else if (latestMessage?.image) {
+          preview = "📷 Photo";
+        } else if (latestMessage?.video) {
+          preview = "🎥 Video";
+        } else if (latestMessage?.fileName) {
+          preview = `📎 ${latestMessage.fileName}`;
+        } else if (latestMessage?.fileUrl) {
+          preview = "📎 Attachment";
+        }
+
         return {
           ...chatPartner,
-          lastMessage: latestMessage?.text || (latestMessage?.image ? "📷 Photo" : ""),
+          lastMessage: preview,
           lastMessageAt: latestMessage?.createdAt || null,
         };
       }),
@@ -89,7 +102,7 @@ export const getMessages = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    const { text, image } = req.body;
+    const { text, image, video, file, fileName, fileSize, fileType } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
@@ -108,34 +121,45 @@ export const sendMessage = async (req, res) => {
 
     const cleanedText = typeof text === "string" ? text.trim() : "";
 
-    if (!cleanedText && !image) {
-      return res.status(400).json({ error: "Message is required" });
-    }
-
-    if (text !== undefined && typeof text !== "string") {
-      return res.status(400).json({ error: "Message text must be a string" });
-    }
-
-    if (image && typeof image !== "string") {
-      return res.status(400).json({ error: "Image must be a valid string" });
-    }
-
-    if (image && !image.startsWith("data:image/")) {
-      return res.status(400).json({ error: "Invalid image format" });
+    if (!cleanedText && !image && !video && !file) {
+      return res.status(400).json({ error: "Message content or attachment is required" });
     }
 
     let imageUrl;
+    let videoUrl;
+    let fileUrl;
+
     if (image) {
-      // Upload base64 image to cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(image);
+      const uploadResponse = await cloudinary.uploader.upload(image, {
+        resource_type: "image",
+      });
       imageUrl = uploadResponse.secure_url;
+    }
+
+    if (video) {
+      const uploadResponse = await cloudinary.uploader.upload(video, {
+        resource_type: "video",
+      });
+      videoUrl = uploadResponse.secure_url;
+    }
+
+    if (file) {
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        resource_type: "auto",
+      });
+      fileUrl = uploadResponse.secure_url;
     }
 
     const newMessage = new Message({
       senderId,
       receiverId,
-      text,
+      text: cleanedText,
       image: imageUrl,
+      video: videoUrl,
+      fileUrl,
+      fileName,
+      fileSize,
+      fileType,
     });
 
     await newMessage.save();
