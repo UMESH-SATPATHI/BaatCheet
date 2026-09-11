@@ -20,7 +20,7 @@ export default function Chat() {
     syncOnlineUsers,
   } = useChatStore();
 
-  const { connectSocket, onlineUsers } = useAuthStore();
+  const { connectSocket, onlineUsers, socket } = useAuthStore();
 
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [isNewChatOpen, setIsNewChatOpen] = useState(false);
@@ -33,13 +33,17 @@ export default function Chat() {
     // Connect socket if not connected
     connectSocket();
 
-    // Subscribe to socket messages
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
     subscribeToMessages();
 
     return () => {
       unsubscribeFromMessages();
     };
-  }, []);
+  }, [socket, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     syncOnlineUsers(onlineUsers);
