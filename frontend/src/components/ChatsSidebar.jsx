@@ -10,7 +10,6 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
-import ProfileHeader from "./profileHeader";
 
 export default function ChatsSidebar({ onOpenNewChat }) {
   const {

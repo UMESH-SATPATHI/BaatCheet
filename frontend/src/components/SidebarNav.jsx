@@ -13,11 +13,12 @@ import {
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
+import ProfileHeader from "./profileHeader";
 
 export default function SidebarNav() {
   const { activeTab, setActiveTab, isSoundEnabled, toggleSound } = useChatStore();
-  const { authUser, logout, isLoggingOut } = useAuthStore();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { authUser } = useAuthStore();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   // Get user initials
   const initials = authUser?.fullName
@@ -124,7 +125,7 @@ export default function SidebarNav() {
         {/* User Avatar with status dot */}
         <div className="relative">
           <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            onClick={() => setIsProfileModalOpen(true)}
             title="Your Profile"
             className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold hover:scale-110 hover:ring-2 hover:ring-purple-400 active:scale-95 transition-all duration-200 cursor-pointer overflow-hidden shadow-md"
           >
@@ -141,46 +142,14 @@ export default function SidebarNav() {
 
           {/* Cyan Online Status Dot */}
           <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#22d3ee] ring-2 ring-[#101014] online-dot pointer-events-none" />
-
-          {/* Profile Dropdown Popover */}
-          {showProfileMenu && (
-            <div
-              className="absolute left-14 bottom-0 w-auto bg-[#18181f] border border-zinc-800 rounded-2xl shadow-2xl p-4 flex flex-col gap-3 z-50 animate-in fade-in zoom-in-95 duration-150"
-              onMouseLeave={() => setShowProfileMenu(false)}
-            >
-              <div className="flex items-center gap-3 pb-3 border-b border-zinc-800/80">
-                <div className="w-10 h-10 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                  {authUser?.profilePic ? (
-                    <img
-                      src={authUser.profilePic}
-                      alt="Profile"
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    initials
-                  )}
-                </div>
-                <div className="flex flex-col overflow-hidden">
-                  <span className="text-sm font-semibold text-white truncate">
-                    {authUser?.fullName || "My Account"}
-                  </span>
-                  <span className="text-xs text-zinc-400 truncate">
-                    {authUser?.email || "online"}
-                  </span>
-                </div>
-              </div>
-              <button
-                onClick={logout}
-                disabled={isLoggingOut}
-                className="flex items-center gap-2 text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 p-2 rounded-xl transition cursor-pointer w-full text-left mt-1"
-              >
-                <LogOut className="w-4 h-4" />
-                <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Profile Header Modal */}
+      <ProfileHeader
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </aside>
   );
 }
