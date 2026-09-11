@@ -13,12 +13,19 @@ passport.deserializeUser(async (userId, done) => {
   }
 });
 
+const callbackURL =
+  process.env.BACKEND_URL
+    ? `${process.env.BACKEND_URL.replace(/\/$/, "")}/api/auth/google/callback`
+    : process.env.NODE_ENV === "production"
+    ? "https://baatcheet-qzcs.onrender.com/api/auth/google/callback"
+    : "/api/auth/google/callback";
+
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "/api/auth/google/callback",
+      callbackURL,
       proxy: true,
     },
     async (_accessToken, _refreshToken, profile, done) => {
