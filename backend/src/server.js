@@ -15,8 +15,8 @@ import messageRoutes from "./routes/message.route.js";
 const PORT = process.env.PORT || 5000;
 const __dirname = path.resolve();
 
-app.use(express.json({ limit: "10mb" }));
 app.set("trust proxy", 1);
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 app.use(
@@ -25,20 +25,10 @@ app.use(
     credentials: true,
   })
 );
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-//     cookie: {
-//       httpOnly: true,
-//       sameSite: "lax",
-//       secure: process.env.NODE_ENV === "production",
-//       maxAge: 7 * 24 * 60 * 60 * 1000,
-//     },
-//   }),
-// );
+
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  (process.env.FRONTEND_URL && process.env.FRONTEND_URL.startsWith("https://"));
 
 app.use(
   session({
@@ -48,9 +38,9 @@ app.use(
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
       httpOnly: true,
-      // Must be 'none' for cross-domain cookies (Vercel <-> Render) in production
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
+      partitioned: isProduction,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
@@ -62,13 +52,9 @@ app.use(passport.session());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", message: "BaatCheet API is running" });
+});
 
 server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

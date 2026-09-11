@@ -14,7 +14,14 @@ router.get(
 	passport.authenticate("google", {
 		failureRedirect: `${getFrontendUrl()}/login`,
 	}),
-	(req, res) => res.redirect(`${getFrontendUrl()}/chat`),
+	(req, res) => {
+		req.session.save((err) => {
+			if (err) {
+				console.error("Error saving session before redirect:", err);
+			}
+			res.redirect(`${getFrontendUrl()}/chat`);
+		});
+	},
 );
 router.post("/logout", logout);
 router.delete("/delete", protectRoute, deleteAccount);
