@@ -87,13 +87,13 @@ export default function ChatArea({ onOpenHelp }) {
   if (!selectedUser) return null;
 
   return (
-    <main className="flex-1 min-w-0 h-full bg-[#131316] flex flex-col relative select-none overflow-hidden">
+    <main className="flex-1 min-w-0 h-full max-h-[100dvh] bg-[#131316] flex flex-col relative select-none overflow-hidden">
       {/* Header Bar */}
-      <header className="h-16 px-6 bg-[#131316] border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-10 relative">
+      <header className="h-14 md:h-16 px-4 md:px-6 bg-[#131316]/95 backdrop-blur-sm border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-10 relative">
         {/* Left: User Avatar & Status */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 md:gap-3">
           <div className="relative">
-            <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
+            <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
 
               {selectedUser.profilePic && !profileImageFailed ? (
                 <img
@@ -110,35 +110,35 @@ export default function ChatArea({ onOpenHelp }) {
           </div>
 
           <div className="flex flex-col">
-            <h2 className="text-sm font-semibold text-white leading-tight">
+            <h2 className="text-xs md:text-sm font-semibold text-white leading-tight">
               {selectedUser.fullName}
             </h2>
-            <span className="text-[11px] font-medium text-[#22d3ee] leading-tight">
+            <span className="text-[10px] md:text-[11px] font-medium text-[#22d3ee] leading-tight">
               {selectedUser.online ? "online" : selectedUser.statusText || "offline"}
             </span>
           </div>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2">
           <button
             onClick={() => toast("Search in chat", { icon: "🔍" })}
             title="Search conversation"
-            className="w-8 h-8 rounded-lg text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#22222c] hover:scale-110 active:scale-95 flex items-center justify-center transition-all duration-200 cursor-pointer"
           >
             <Search className="w-4 h-4" />
           </button>
           <button
             onClick={() => toast("Voice call starting...", { icon: "📞" })}
             title="Voice Call"
-            className="w-8 h-8 rounded-lg text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#22222c] hover:scale-110 active:scale-95 flex items-center justify-center transition-all duration-200 cursor-pointer"
           >
             <Phone className="w-4 h-4" />
           </button>
           <button
             onClick={() => toast("Video call starting...", { icon: "📹" })}
             title="Video Call"
-            className="w-8 h-8 rounded-lg text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#22222c] hover:scale-110 active:scale-95 flex items-center justify-center transition-all duration-200 cursor-pointer"
           >
             <Video className="w-4 h-4" />
           </button>
@@ -352,7 +352,7 @@ export default function ChatArea({ onOpenHelp }) {
       )}
 
       {/* Bottom Message Input Bar */}
-      <footer className="p-4 bg-[#131316] flex items-center gap-3 shrink-0 relative">
+      <footer className="p-3 md:p-4 pb-safe bg-[#131316]/95 backdrop-blur-sm flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/40">
         {/* Hidden file input */}
         <input
           type="file"
@@ -365,14 +365,14 @@ export default function ChatArea({ onOpenHelp }) {
         {/* Input Wrapper Container */}
         <form
           onSubmit={handleSendMessage}
-          className="flex-1 bg-[#222228] rounded-full px-4 py-2.5 flex items-center gap-3 border border-zinc-800/60 focus-within:border-[#8b5cf6]/60 transition"
+          className="flex-1 bg-[#222228] rounded-full px-3.5 md:px-4 py-2 md:py-2.5 flex items-center gap-2.5 md:gap-3 border border-zinc-800/60 focus-within:border-[#8b5cf6]/70 focus-within:shadow-[0_0_16px_rgba(139,92,246,0.18)] transition-all duration-200"
         >
           {/* Emoji Button */}
           <button
             type="button"
             onClick={() => setShowEmojiMenu(!showEmojiMenu)}
             title="Insert emoji"
-            className="text-zinc-400 hover:text-zinc-200 transition cursor-pointer shrink-0"
+            className="text-zinc-400 hover:text-yellow-400 hover:scale-115 active:scale-90 transition-all duration-200 cursor-pointer shrink-0"
           >
             <Smile className="w-5 h-5" />
           </button>
@@ -382,7 +382,7 @@ export default function ChatArea({ onOpenHelp }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             title="Attach file or photo"
-            className="text-zinc-400 hover:text-zinc-200 transition cursor-pointer shrink-0"
+            className="text-zinc-400 hover:text-purple-400 hover:scale-115 active:scale-90 transition-all duration-200 cursor-pointer shrink-0"
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -401,9 +401,9 @@ export default function ChatArea({ onOpenHelp }) {
             type="submit"
             disabled={!inputMessage.trim() && !previewImage && !selectedFile}
             title="Send message"
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer shrink-0 ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
               inputMessage.trim() || previewImage || selectedFile
-                ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white shadow-md shadow-purple-900/40"
+                ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white shadow-md shadow-purple-900/40 hover:shadow-purple-500/50 hover:scale-110 active:scale-95"
                 : "text-zinc-600 hover:text-zinc-500 cursor-not-allowed"
             }`}
           >
@@ -415,7 +415,7 @@ export default function ChatArea({ onOpenHelp }) {
         <button
           onClick={onOpenHelp}
           title="Help & Info"
-          className="w-9 h-9 rounded-full bg-[#202028] border border-zinc-800 text-zinc-400 hover:text-white hover:bg-[#292934] flex items-center justify-center shadow-lg transition cursor-pointer shrink-0"
+          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#202028] border border-zinc-800 text-zinc-400 hover:text-white hover:bg-[#2a2a36] hover:border-purple-500/40 hover:scale-110 active:scale-90 flex items-center justify-center shadow-lg transition-all duration-200 cursor-pointer shrink-0"
         >
           <span className="text-sm font-semibold">?</span>
         </button>

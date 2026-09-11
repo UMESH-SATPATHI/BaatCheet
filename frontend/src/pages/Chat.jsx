@@ -50,7 +50,7 @@ export default function Chat() {
   }, [onlineUsers, syncOnlineUsers]);
 
   return (
-    <div className="flex h-screen w-full max-w-full bg-[#121214] text-zinc-100 overflow-hidden select-none">
+    <div className="flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-full max-w-full bg-[#121214] text-zinc-100 overflow-hidden select-none">
       {/* 1. Leftmost Navigation Rail */}
       <SidebarNav />
 
