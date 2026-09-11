@@ -40,7 +40,6 @@ app.use(
       httpOnly: true,
       sameSite: isProduction ? "none" : "lax",
       secure: isProduction,
-      partitioned: isProduction,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     },
   }),
