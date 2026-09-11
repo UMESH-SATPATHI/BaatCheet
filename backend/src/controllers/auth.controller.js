@@ -8,11 +8,7 @@ export const logout = (req, res) => {
     req.session.destroy((sessionError) => {
       if (sessionError) return res.status(500).json({ message: "Logout failed" });
 
-      const isProduction = process.env.NODE_ENV === "production";
-      res.clearCookie("connect.sid", {
-        sameSite: isProduction ? "none" : "lax",
-        secure: isProduction,
-      });
+      res.clearCookie("connect.sid");
       res.status(200).json({ message: "Logged out successfully" });
     });
   });
@@ -70,11 +66,7 @@ export const deleteAccount = async (req, res) => {
           return res.status(500).json({ message: "Account deletion session cleanup failed" });
         }
 
-        const isProduction = process.env.NODE_ENV === "production";
-        res.clearCookie("connect.sid", {
-          sameSite: isProduction ? "none" : "lax",
-          secure: isProduction,
-        });
+        res.clearCookie("connect.sid");
         res.status(200).json({ message: "Account deleted successfully" });
       });
     });

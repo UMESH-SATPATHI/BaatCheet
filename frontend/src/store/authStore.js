@@ -3,11 +3,7 @@ import axiosInstance from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.MODE === "production"
-    ? "https://baatcheet-qzcs.onrender.com"
-    : "http://localhost:5000");
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -23,9 +19,7 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
-      if (error.response?.status !== 401) {
-        console.error("Error in authCheck:", error);
-      }
+      console.log("Error in authCheck:", error);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
