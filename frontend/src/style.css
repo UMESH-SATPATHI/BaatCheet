@@ -67,19 +67,18 @@ body,
 }
 
 .chat-card-interactive {
-  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .chat-card-interactive:hover {
-  transform: translateX(4px);
   background-color: #1e1e27;
   border-color: rgba(139, 92, 246, 0.25);
-  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.35);
 }
 
 .chat-card-interactive:active {
-  transform: scale(0.985) translateX(2px);
+  background-color: #242430;
 }
+
 
 .nav-icon-interactive {
   position: relative;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Users } from "lucide-react";
+import { Search, Users, ArrowLeft } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 
 export default function ContactsView({ onOpenHelp }) {
@@ -26,11 +26,20 @@ export default function ContactsView({ onOpenHelp }) {
   return (
     <main className="flex-1 h-full bg-[#131316] flex flex-col relative select-none overflow-hidden">
       {/* Top Header */}
-      <header className="px-8 pt-6 pb-2 shrink-0">
-        <h1 className="text-xl font-bold text-white tracking-tight">Contacts</h1>
+      <header className="px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setActiveTab("chats")}
+            title="Back to chats"
+            className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-zinc-800/80 rounded-xl transition cursor-pointer shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight">Contacts</h1>
+        </div>
 
         {/* Search Contacts input */}
-        <div className="mt-4 bg-[#24242c] rounded-4xl flex items-center px-4 py-3 gap-3 border border-transparent focus-within:border-[#8b5cf6]/50 transition shadow-sm">
+        <div className="mt-3 sm:mt-4 bg-[#24242c] rounded-4xl flex items-center px-4 py-2.5 sm:py-3 gap-3 border border-transparent focus-within:border-[#8b5cf6]/50 transition shadow-sm">
           <Search className="w-4 h-4 text-zinc-400 shrink-0" />
           <input
             type="text"
@@ -43,7 +52,7 @@ export default function ContactsView({ onOpenHelp }) {
       </header>
 
       {/* Contacts List */}
-      <div className="flex-1 overflow-y-auto px-6 py-2 space-y-1">
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 py-2 space-y-1">
         {filteredContacts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 px-4 text-center">
             <div className="w-12 h-12 rounded-2xl bg-[#24242c] flex items-center justify-center text-zinc-500 mb-3">

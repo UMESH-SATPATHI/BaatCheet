@@ -31,30 +31,30 @@ export default function SidebarNav() {
     : "ME";
 
   return (
-    <aside className="w-[60px] md:w-[68px] h-full max-h-[100dvh] bg-[#101014] border-r border-[#1f1f26] flex flex-col items-center justify-between py-3 md:py-4 select-none shrink-0 z-20 overflow-y-auto overflow-x-hidden scrollbar-none">
+    <aside className="w-[52px] sm:w-[60px] md:w-[68px] h-full max-h-[100dvh] bg-[#101014] border-r border-[#1f1f26] flex flex-col items-center justify-between py-2.5 sm:py-3 md:py-4 select-none shrink-0 z-20 overflow-y-auto overflow-x-hidden scrollbar-none">
       {/* Top Section: Brand Logo & Nav Icons */}
-      <div className="flex flex-col items-center gap-3 md:gap-6 w-full shrink-0">
+      <div className="flex flex-col items-center gap-2.5 sm:gap-3 md:gap-6 w-full shrink-0">
         {/* Brand App Logo */}
         <button
           onClick={() => setActiveTab("chats")}
           title="BaatCheet"
-          className="w-10 h-10 md:w-11 md:h-11 bg-gradient-to-tr from-[#7c3aed] to-[#9333ea] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/40 hover:scale-110 hover:rotate-3 hover:shadow-purple-500/50 active:scale-95 transition-all duration-200 cursor-pointer"
+          className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 bg-gradient-to-tr from-[#7c3aed] to-[#9333ea] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/40 hover:rotate-3 hover:shadow-purple-500/50 active:scale-95 transition-all duration-200 cursor-pointer"
         >
-          <MessageSquare className="w-5 h-5 md:w-6 md:h-6 text-white fill-white" />
+          <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-white fill-white" />
         </button>
 
         {/* Navigation List */}
-        <nav className="flex flex-col items-center gap-2 md:gap-3 w-full px-1.5 md:px-2" aria-label="Main Navigation">
+        <nav className="flex flex-col items-center gap-1.5 sm:gap-2 md:gap-3 w-full px-1 sm:px-1.5 md:px-2" aria-label="Main Navigation">
           {/* Chats Icon */}
           <button
             onClick={() => setActiveTab("chats")}
             title="Chats"
-            className={`w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${activeTab === "chats"
+            className={`w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-95 ${activeTab === "chats"
                 ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/40"
                 : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
               }`}
           >
-            <MessageSquare className="w-5 h-5" />
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Contacts / Users Icon */}

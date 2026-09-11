@@ -52,19 +52,37 @@ export default function Chat() {
   return (
     <div className="flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-full max-w-full bg-[#121214] text-zinc-100 overflow-hidden select-none">
       {/* 1. Leftmost Navigation Rail */}
-      <SidebarNav />
+      <div className={`${selectedUser ? "hidden md:flex" : "flex"} shrink-0 h-full`}>
+        <SidebarNav />
+      </div>
 
       {/* 2. Middle Chats Sidebar */}
-      <ChatsSidebar onOpenNewChat={() => setIsNewChatOpen(true)} />
+      <div
+        className={`${
+          selectedUser || activeTab === "contacts"
+            ? "hidden md:flex"
+            : "flex flex-1 md:flex-initial"
+        } h-full overflow-hidden`}
+      >
+        <ChatsSidebar onOpenNewChat={() => setIsNewChatOpen(true)} />
+      </div>
 
       {/* 3. Main Center Content Area */}
-      {activeTab === "contacts" ? (
-        <ContactsView onOpenHelp={() => setIsHelpOpen(true)} />
-      ) : selectedUser ? (
-        <ChatArea onOpenHelp={() => setIsHelpOpen(true)} />
-      ) : (
-        <EmptyChatState onOpenHelp={() => setIsHelpOpen(true)} />
-      )}
+      <div
+        className={`${
+          !selectedUser && activeTab !== "contacts"
+            ? "hidden md:flex"
+            : "flex"
+        } flex-1 min-w-0 h-full overflow-hidden`}
+      >
+        {activeTab === "contacts" ? (
+          <ContactsView onOpenHelp={() => setIsHelpOpen(true)} />
+        ) : selectedUser ? (
+          <ChatArea onOpenHelp={() => setIsHelpOpen(true)} />
+        ) : (
+          <EmptyChatState onOpenHelp={() => setIsHelpOpen(true)} />
+        )}
+      </div>
 
       {/* Modals */}
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />

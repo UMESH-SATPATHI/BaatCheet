@@ -13,13 +13,14 @@ import {
   X,
   Heart,
   Flame,
+  ArrowLeft,
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
 
 export default function ChatArea({ onOpenHelp }) {
-  const { selectedUser, messages, sendMessage, addReaction, isMessageLoading } = useChatStore();
+  const { selectedUser, setSelectedUser, messages, sendMessage, addReaction, isMessageLoading } = useChatStore();
   const { authUser } = useAuthStore();
 
   const [inputMessage, setInputMessage] = useState("");
@@ -89,10 +90,19 @@ export default function ChatArea({ onOpenHelp }) {
   return (
     <main className="flex-1 min-w-0 h-full max-h-[100dvh] bg-[#131316] flex flex-col relative select-none overflow-hidden">
       {/* Header Bar */}
-      <header className="h-14 md:h-16 px-4 md:px-6 bg-[#131316]/95 backdrop-blur-sm border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-10 relative">
-        {/* Left: User Avatar & Status */}
-        <div className="flex items-center gap-2.5 md:gap-3">
-          <div className="relative">
+      <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#131316]/95 backdrop-blur-sm border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-10 relative">
+        {/* Left: Back button (mobile) + User Avatar & Status */}
+        <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 min-w-0">
+          {/* Mobile Back Button */}
+          <button
+            onClick={() => setSelectedUser(null)}
+            title="Back to chats"
+            className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-zinc-800/80 rounded-xl transition-colors cursor-pointer shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+
+          <div className="relative shrink-0">
             <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
 
               {selectedUser.profilePic && !profileImageFailed ? (
@@ -162,7 +172,7 @@ export default function ChatArea({ onOpenHelp }) {
       {/* Messages Scroll Area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden px-6 py-4 flex flex-col gap-3"
+        className="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 md:px-6 py-3 md:py-4 flex flex-col gap-3"
       >
         {isMessageLoading && messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-2 py-10">
@@ -202,7 +212,7 @@ export default function ChatArea({ onOpenHelp }) {
                 >
                   {/* Outgoing Message */}
                   {isMe ? (
-                    <div className="flex flex-col items-end max-w-[70%]">
+                    <div className="flex flex-col items-end max-w-[85%] sm:max-w-[75%] md:max-w-[70%]">
                       {/* Image Attachment Preview */}
                       {msg.image && (
                         <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group">
@@ -252,7 +262,7 @@ export default function ChatArea({ onOpenHelp }) {
                     </div>
                   ) : (
                     /* Incoming Message */
-                    <div className="flex flex-col items-start max-w-[70%]">
+                    <div className="flex flex-col items-start max-w-[85%] sm:max-w-[75%] md:max-w-[70%]">
                       {/* Incoming Image */}
                       {msg.image && (
                         <div className="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-800/80 mb-1 max-w-sm group">

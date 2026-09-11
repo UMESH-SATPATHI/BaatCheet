@@ -21,6 +21,25 @@ export default function ProfileHeader({ isOpen, onClose }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // Mount/animate states for open & close transitions
+  const [isMounted, setIsMounted] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (isOpen) {
+      setIsMounted(true);
+      timer = setTimeout(() => setIsAnimating(true), 20);
+    } else {
+      setIsAnimating(false);
+      timer = setTimeout(() => {
+        setIsMounted(false);
+        setShowDeleteConfirm(false);
+      }, 200);
+    }
+    return () => clearTimeout(timer);
+  }, [isOpen]);
+
   // Close on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -32,7 +51,7 @@ export default function ProfileHeader({ isOpen, onClose }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isMounted) return null;
 
   const initials = authUser?.fullName
     ? authUser.fullName
@@ -72,32 +91,38 @@ export default function ProfileHeader({ isOpen, onClose }) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200"
+      className={`fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50 transition-opacity duration-200 ease-out ${
+        isAnimating ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#17171e] border border-zinc-800 w-full max-w-md rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-200 flex flex-col gap-5"
+        className={`bg-[#17171e] border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 sm:gap-5 transition-all duration-200 ease-out ${
+          isAnimating
+            ? "opacity-100 scale-100 translate-y-0"
+            : "opacity-0 scale-95 translate-y-2 pointer-events-none"
+        }`}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
           title="Close (Esc)"
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-700 flex items-center justify-center transition cursor-pointer"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-700 flex items-center justify-center transition cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Modal Title */}
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">Your Profile</h2>
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">Your Profile</h2>
           <p className="text-xs text-zinc-400">Manage your profile and account settings</p>
         </div>
 
         {/* Profile Avatar Card */}
-        <div className="flex flex-col items-center p-5 bg-[#121217] rounded-2xl border border-zinc-800/80 relative">
+        <div className="flex flex-col items-center p-4 sm:p-5 bg-[#121217] rounded-2xl border border-zinc-800/80 relative">
           <div className="relative group">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-0.5 shadow-xl">
-              <div className="w-full h-full rounded-full bg-[#17171e] overflow-hidden flex items-center justify-center text-white text-xl font-bold">
+            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-0.5 shadow-xl">
+              <div className="w-full h-full rounded-full bg-[#17171e] overflow-hidden flex items-center justify-center text-white text-lg sm:text-xl font-bold">
                 {authUser?.profilePic ? (
                   <img
                     src={authUser.profilePic}
@@ -111,7 +136,7 @@ export default function ProfileHeader({ isOpen, onClose }) {
             </div>
 
             {/* Online Badge */}
-            <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-[#22d3ee] ring-2 ring-[#121217] online-dot" />
+            <span className="absolute bottom-1 right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#22d3ee] ring-2 ring-[#121217] online-dot" />
 
             {/* Change Photo Overlay Button */}
             <button
@@ -137,7 +162,7 @@ export default function ProfileHeader({ isOpen, onClose }) {
             />
           </div>
 
-          <h3 className="text-base font-bold text-white mt-3 leading-tight">
+          <h3 className="text-sm sm:text-base font-bold text-white mt-3 leading-tight">
             {authUser?.fullName || "User"}
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">{authUser?.email || "online"}</p>
@@ -151,21 +176,21 @@ export default function ProfileHeader({ isOpen, onClose }) {
         {/* Preferences & Settings */}
         <div className="space-y-2 text-xs">
           {/* Sound Notifications Toggle */}
-          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-400">
+          <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-8 h-8 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-400 shrink-0">
                 {isSoundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-zinc-500" />}
               </div>
               <div>
-                <span className="font-semibold text-white block">Message Sounds</span>
-                <span className="text-[11px] text-zinc-400">
+                <span className="font-semibold text-white block text-xs">Message Sounds</span>
+                <span className="text-[10px] sm:text-[11px] text-zinc-400">
                   {isSoundEnabled ? "Sound effects active" : "Sounds muted"}
                 </span>
               </div>
             </div>
             <button
               onClick={toggleSound}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 cursor-pointer ${
                 isSoundEnabled
                   ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/30 hover:bg-[#7c3aed]"
                   : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
@@ -176,13 +201,13 @@ export default function ProfileHeader({ isOpen, onClose }) {
           </div>
 
           {/* Security & Encryption Info */}
-          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
+          <div className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
             <div className="w-8 h-8 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-400 shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <span className="font-semibold text-white block">Protected Connection</span>
-              <span className="text-[11px] text-zinc-400">
+              <span className="font-semibold text-white block text-xs">Protected Connection</span>
+              <span className="text-[10px] sm:text-[11px] text-zinc-400">
                 All messages and media transfers are encrypted.
               </span>
             </div>
@@ -190,11 +215,11 @@ export default function ProfileHeader({ isOpen, onClose }) {
         </div>
 
         {/* Danger Zone / Log Out Action */}
-        <div className="pt-2 flex flex-col gap-2">
+        <div className="pt-1 sm:pt-2 flex flex-col gap-2">
           <button
             onClick={logout}
             disabled={isLoggingOut}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 font-semibold text-xs border border-rose-500/20 hover:scale-[1.01] active:scale-[0.98] transition cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 font-semibold text-xs border border-rose-500/20 transition-colors duration-150 cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
@@ -203,12 +228,12 @@ export default function ProfileHeader({ isOpen, onClose }) {
           {!showDeleteConfirm ? (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="text-[11px] text-zinc-500 hover:text-rose-400 transition cursor-pointer text-center py-1"
+              className="text-[11px] text-zinc-500 hover:text-rose-400 transition-colors duration-150 cursor-pointer text-center py-1"
             >
               Delete account
             </button>
           ) : (
-            <div className="p-3 bg-rose-950/20 border border-rose-900/40 rounded-2xl flex flex-col gap-2 text-center animate-in fade-in duration-150">
+            <div className="p-3 bg-rose-950/20 border border-rose-900/40 rounded-2xl flex flex-col gap-2 text-center">
               <p className="text-[11px] text-rose-300 font-medium">Are you sure? This cannot be undone.</p>
               <div className="flex items-center justify-center gap-2">
                 <button
