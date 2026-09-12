@@ -366,8 +366,8 @@ export default function ChatArea({ onOpenHelp }) {
               <h2 className="text-xs md:text-sm font-semibold text-white leading-tight truncate">
                 {selectedUser.fullName}
               </h2>
-              <span className="text-[10px] md:text-[11px] font-medium text-[#22d3ee] leading-tight">
-                {selectedUser.online ? "online" : selectedUser.statusText || "offline"}
+              <span className="text-[10px] md:text-[11px] font-medium text-[#bbb] leading-tight">
+                {selectedUser.online ? "Online" : selectedUser.statusText || "Offline"}
               </span>
             </div>
           </div>
