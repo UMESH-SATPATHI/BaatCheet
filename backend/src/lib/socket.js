@@ -40,6 +40,40 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   if (userId) {
     userSocketMap[userId] = socket.id;
+
+    // Asynchronously update pending messages for this user to "delivered"
+    import("../models/message.model.js")
+      .then(({ default: Message }) => {
+        Message.find({ receiverId: userId, status: "sent" })
+          .select("_id senderId")
+          .then((messagesToDeliver) => {
+            if (messagesToDeliver.length > 0) {
+              Message.updateMany(
+                { receiverId: userId, status: "sent" },
+                { status: "delivered" }
+              ).exec();
+
+              // Notify each sender that their messages were delivered
+              const messagesBySender = {};
+              messagesToDeliver.forEach((m) => {
+                const sId = m.senderId.toString();
+                if (!messagesBySender[sId]) messagesBySender[sId] = [];
+                messagesBySender[sId].push(m._id.toString());
+              });
+
+              Object.entries(messagesBySender).forEach(([sId, mIds]) => {
+                const senderSocketId = userSocketMap[sId];
+                if (senderSocketId) {
+                  io.to(senderSocketId).emit("messagesDelivered", {
+                    messageIds: mIds,
+                  });
+                }
+              });
+            }
+          })
+          .catch((err) => console.error("Error updating delivered status:", err));
+      })
+      .catch((err) => console.error("Error importing Message model:", err));
   }
 
   // io.emit() is used to send events to all connected clients
