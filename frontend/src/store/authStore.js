@@ -97,3 +97,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 }));
+
+if (typeof window !== "undefined") {
+  window.__useAuthStore = useAuthStore;
+}

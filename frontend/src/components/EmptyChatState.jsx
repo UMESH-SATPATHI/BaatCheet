@@ -1,32 +1,61 @@
-import React, { useState } from "react";
-import { MessageSquare, HelpCircle } from "lucide-react";
+import React from "react";
+import { MessageSquare, ShieldCheck } from "lucide-react";
+import { Ripple, AnimatedShinyText } from "./magicui";
 
 export default function EmptyChatState({ onOpenHelp }) {
   return (
-    <main className="flex-1 h-full bg-[#131316] flex flex-col items-center justify-center relative select-none p-6">
-      {/* Center Content */}
-      <div className="flex flex-col items-center text-center max-w-sm">
-        {/* App Logo Big Squircle */}
-        <div className="w-20 h-20 rounded-3xl bg-[#8b5cf6] flex items-center justify-center shadow-2xl shadow-purple-900/50 mb-4 animate-in fade-in zoom-in-90 duration-300">
-          <MessageSquare className="w-10 h-10 text-white fill-white" />
+    <main
+      className="relative flex-1 h-full flex flex-col items-center justify-center select-none p-6 overflow-hidden"
+      style={{
+        backgroundColor: "#131316",
+        backgroundImage: `
+          radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.07), transparent 60%),
+          radial-gradient(circle at 80% 20%, rgba(34, 211, 238, 0.04), transparent 45%)
+        `,
+      }}
+    >
+      {/* 1. Magic UI Ripple concentric wave animation */}
+      <Ripple
+        mainCircleSize={220}
+        mainCircleOpacity={0.18}
+        numCircles={6}
+        className="opacity-80"
+      />
+
+      {/* 2. Center Content */}
+      <div className="relative z-10 flex flex-col items-center text-center max-w-sm">
+        {/* App Logo Big Squircle with glowing aura */}
+        <div className="relative mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-tr from-[#7c3aed] to-[#9333ea] shadow-2xl shadow-purple-900/60 p-0.5 overflow-hidden">
+          <div className="w-full h-full rounded-[22px] flex items-center justify-center bg-gradient-to-tr from-[#7c3aed] to-[#9333ea]">
+            <MessageSquare className="w-10 h-10 text-white fill-white" />
+          </div>
         </div>
 
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-white tracking-tight">BaatCheet</h2>
+        {/* Title with Magic UI Animated Shiny Text */}
+        <h2 className="text-2xl font-extrabold tracking-tight text-white mb-1">
+          <AnimatedShinyText shimmerWidth={100}>
+            BaatCheet
+          </AnimatedShinyText>
+        </h2>
 
         {/* Subtitle */}
-        <p className="text-base font-medium text-zinc-300 mt-2">
+        <p className="text-sm font-semibold text-zinc-300 mt-1">
           Select a conversation
         </p>
 
         {/* Secondary description */}
-        <p className="text-xs text-zinc-400 mt-1">
-          Choose from your existing chats or start a new one
+        <p className="text-xs text-zinc-400 mt-1 max-w-[240px] leading-relaxed">
+          Choose from your existing chats or start a new one to begin messaging
         </p>
 
-        {/* End-to-end Encrypted Pill */}
-        <div className="mt-6 flex items-center gap-2 bg-[#1c1c23] border border-zinc-800/90 px-4 py-2 rounded-full shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-[#22d3ee]" />
+        {/* End-to-end Encrypted Pill with subtle glow */}
+        <div
+          className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full border border-purple-500/20 shadow-md backdrop-blur-md"
+          style={{
+            backgroundColor: "rgba(28, 28, 35, 0.7)",
+          }}
+        >
+          <span className="w-2 h-2 rounded-full bg-[#22d3ee] online-dot" />
           <span className="text-xs text-zinc-300 font-medium">
             End-to-end encrypted
           </span>
@@ -37,7 +66,7 @@ export default function EmptyChatState({ onOpenHelp }) {
       <button
         onClick={onOpenHelp}
         title="Help & Info"
-        className="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-[#1f1f26] border border-zinc-800/80 text-zinc-400 hover:text-white hover:bg-[#282832] flex items-center justify-center shadow-lg transition cursor-pointer"
+        className="absolute bottom-6 right-6 w-9 h-9 rounded-full bg-[#1f1f26] border border-zinc-800/80 text-zinc-400 hover:text-white hover:bg-[#282832] flex items-center justify-center shadow-lg transition cursor-pointer z-10 hover:scale-105 active:scale-95"
       >
         <span className="text-sm font-semibold">?</span>
       </button>
