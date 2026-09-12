@@ -40,11 +40,13 @@ export default function ChatsSidebar({ onOpenNewChat }) {
     if (activeFilter === "unread") {
       return (chat.unreadCount || 0) > 0;
     }
-    if (activeFilter === "favorites") {
-      return !!chat.isFavorite;
-    }
     return true;
   });
+
+  const totalUnreadCount = chats.reduce(
+    (acc, chat) => acc + (chat.unreadCount || 0),
+    0
+  );
 
   return (
     <aside className="w-full sm:w-[300px] md:w-[310px] lg:w-[340px] flex-1 sm:flex-initial h-full max-h-[100dvh] bg-[#17171c] border-r border-[#22222b] flex flex-col select-none shrink-0 z-10 overflow-hidden">
@@ -55,9 +57,16 @@ export default function ChatsSidebar({ onOpenNewChat }) {
             <span className="text-[10px] tracking-widest text-zinc-400 uppercase font-semibold">
               BaatCheet
             </span>
-            <h1 className="text-lg md:text-xl font-bold text-white tracking-tight leading-none mt-1">
-              Chats
-            </h1>
+            <div className="flex items-center gap-2 mt-1">
+              <h1 className="text-lg md:text-xl font-bold text-white tracking-tight leading-none">
+                Chats
+              </h1>
+              {totalUnreadCount > 0 && (
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-[#8b5cf6] text-white rounded-full shadow-sm animate-in zoom-in-75 duration-150">
+                  {totalUnreadCount}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Header Action Buttons */}
@@ -162,14 +171,26 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                         {chat.fullName}
                       </span>
                     </div>
-                    <span className="text-[10px] md:text-[11px] text-zinc-400 shrink-0 font-medium">
+                    <span
+                      className={`text-[10px] md:text-[11px] shrink-0 font-medium transition-colors ${
+                        (chat.unreadCount || 0) > 0
+                          ? "text-[#22d3ee] font-bold"
+                          : "text-zinc-400"
+                      }`}
+                    >
                       {chat.lastMessageTime || ""}
                     </span>
                   </div>
 
                   {/* Bottom line: Last Message Snippet + Unread Badge */}
                   <div className="flex items-center justify-between gap-2 mt-1">
-                    <p className="text-[11px] md:text-xs text-zinc-400 truncate flex-1 leading-snug group-hover:text-zinc-300 transition-colors">
+                    <p
+                      className={`text-[11px] md:text-xs truncate flex-1 leading-snug transition-colors ${
+                        (chat.unreadCount || 0) > 0
+                          ? "text-zinc-200 font-medium"
+                          : "text-zinc-400 group-hover:text-zinc-300"
+                      }`}
+                    >
                       {chat.lastMessage === "Attachment" ? (
                         <span className="flex items-center gap-1">
                           <ImageIcon className="w-3.5 h-3.5 shrink-0" />
@@ -181,7 +202,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                     </p>
 
                     {(chat.unreadCount || 0) > 0 && (
-                      <span className="bg-[#8b5cf6] text-white text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                      <span className="bg-[#8b5cf6] text-white text-[10px] font-extrabold min-w-[18px] h-[18px] px-1.5 rounded-full flex items-center justify-center shrink-0 shadow-sm shadow-purple-950/40 animate-in zoom-in-75 duration-150">
                         {chat.unreadCount}
                       </span>
                     )}

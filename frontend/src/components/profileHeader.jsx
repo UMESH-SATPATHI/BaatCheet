@@ -97,11 +97,15 @@ export default function ProfileHeader({ isOpen, onClose }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#17171e] border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 sm:gap-5 transition-all duration-200 ease-out ${
+        className={`border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 sm:gap-5 transition-all duration-200 ease-out overflow-hidden backdrop-blur-xl ${
           isAnimating
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-2 pointer-events-none"
         }`}
+        style={{
+          backgroundColor: "rgba(23, 23, 30, 0.9)",
+          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px -10px rgba(139, 92, 246, 0.2)",
+        }}
       >
         {/* Close Button */}
         <button

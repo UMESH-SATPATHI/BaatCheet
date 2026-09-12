@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin "daisyui";
 
 :root {
   color-scheme: dark;
@@ -224,6 +223,83 @@ body,
 
 .skeleton-bouncy {
   animation: skeletonPulse 1.6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Magic UI Keyframes and Effects */
+@keyframes border-beam {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-border-beam {
+  animation: border-beam 8s linear infinite;
+}
+
+@keyframes ripple {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+}
+
+.animate-ripple {
+  animation: ripple var(--duration, 2s) ease-in-out calc(var(--i, 0) * 0.2s) infinite;
+}
+
+@keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width, 100px)) 0;
+  }
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width, 100px)) 0;
+  }
+}
+
+.animate-shiny-text {
+  animation: shiny-text 7s infinite;
+}
+
+@keyframes meteor {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(215deg) translateX(-500px);
+    opacity: 0;
+  }
+}
+
+.animate-meteor {
+  animation: meteor 5s linear infinite;
+}
+
+@keyframes horizontal-fill-progress {
+  0% {
+    width: 0%;
+    left: 0%;
+  }
+  50% {
+    width: 65%;
+    left: 15%;
+  }
+  100% {
+    width: 100%;
+    left: 0%;
+  }
+}
+
+.animate-horizontal-fill {
+  animation: horizontal-fill-progress 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 

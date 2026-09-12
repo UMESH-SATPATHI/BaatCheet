@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   MessageSquare,
   Users,
-  Phone,
   FileText,
   Settings,
   Volume2,
@@ -69,17 +68,6 @@ export default function SidebarNav() {
             <Users className="w-5 h-5" />
           </button>
 
-          {/* Phone / Calls Icon */}
-          <button
-            onClick={() => setActiveTab("calls")}
-            title="Calls"
-            className={`w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95 ${activeTab === "calls"
-                ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/40"
-                : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
-              }`}
-          >
-            <Phone className="w-5 h-5" />
-          </button>
 
           {/* Documents / Files Icon */}
           <button

@@ -58,11 +58,15 @@ export default function NewChatModal({ isOpen, onClose }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-[#181820] border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col max-h-[85vh] transition-all duration-200 ease-out ${
+        className={`border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col max-h-[85vh] transition-all duration-200 ease-out overflow-hidden backdrop-blur-xl ${
           isAnimating
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 translate-y-2 pointer-events-none"
         }`}
+        style={{
+          backgroundColor: "rgba(24, 24, 32, 0.9)",
+          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px -10px rgba(139, 92, 246, 0.2)",
+        }}
       >
         <button
           onClick={onClose}
@@ -103,7 +107,7 @@ export default function NewChatModal({ isOpen, onClose }) {
                 onClick={() => handleStartChat(contact)}
                 className="flex items-center gap-3 p-2.5 rounded-2xl hover:bg-[#22222d] cursor-pointer transition-colors duration-150"
               >
-                <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm">
                   {contact.profilePic && !failedProfilePics.has(contact._id) ? (
                     <img
                       src={contact.profilePic}
