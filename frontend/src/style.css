@@ -242,14 +242,16 @@ body,
 @keyframes ripple {
   0%, 100% {
     transform: translate(-50%, -50%) scale(1);
+    opacity: var(--base-opacity, 0.25);
   }
   50% {
     transform: translate(-50%, -50%) scale(0.92);
+    opacity: calc(var(--base-opacity, 0.25) * 1.45);
   }
 }
 
 .animate-ripple {
-  animation: ripple var(--duration, 2s) ease-in-out calc(var(--i, 0) * 0.2s) infinite;
+  animation: ripple var(--duration, 3s) ease-in-out calc(var(--i, 0) * 0.22s) infinite;
 }
 
 @keyframes shiny-text {

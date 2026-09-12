@@ -5,3 +5,6 @@ export { default as Ripple } from "./Ripple";
 export { default as AnimatedShinyText } from "./AnimatedShinyText";
 export { default as AnimatedGridPattern } from "./AnimatedGridPattern";
 export { default as Meteors } from "./Meteors";
+export { default as MagicCard } from "./MagicCard";
+export { default as InteractiveHoverButton } from "./InteractiveHoverButton";
+export { VerticalDock, VerticalDockIcon } from "./VerticalDock";

@@ -3,7 +3,8 @@ import { useAuthStore } from "../store/authStore";
 import { MessageSquare, ShieldCheck, LogOut, Trash2, LoaderCircle } from "lucide-react";
 import {
   Particles,
-  ShimmerButton,
+  InteractiveHoverButton,
+  MagicCard,
   AnimatedShinyText,
   Meteors,
 } from "../components/magicui";
@@ -49,14 +50,8 @@ export default function Login() {
         }}
       />
 
-      {/* 2. Central Authentication Card */}
-      <section
-        className="relative z-10 w-full max-w-md overflow-hidden rounded-3xl border border-zinc-800/80 p-7 sm:p-9 text-center shadow-2xl transition-all duration-300 backdrop-blur-xl"
-        style={{
-          backgroundColor: "rgba(22, 22, 28, 0.75)",
-          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 35px -10px rgba(139, 92, 246, 0.2)",
-        }}
-      >
+      {/* 2. Central Authentication Card with MagicCard cursor-tracking orb */}
+      <MagicCard className="w-full max-w-md">
 
         {/* Brand App Icon with glowing aura */}
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 shadow-lg shadow-purple-900/50">
@@ -125,52 +120,35 @@ export default function Login() {
               Sign in with your Google Account to connect with your team and friends.
             </p>
 
-            {/* Magic UI Shimmer Button for Google Authentication */}
+            {/* Magic UI Interactive Hover Button for Google Authentication */}
             <div className="flex justify-center w-full">
-              <ShimmerButton
+              <InteractiveHoverButton
                 onClick={handleGoogleLogin}
+                loading={isLoggingIn}
                 disabled={isLoggingIn}
-                className="w-full py-3.5 shadow-xl"
-                shimmerColor="#c084fc"
-                shimmerDuration="2.5s"
-                background="linear-gradient(135deg, rgba(124, 58, 237, 0.85) 0%, rgba(91, 33, 182, 0.95) 100%)"
+                icon={
+                  <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                    />
+                  </svg>
+                }
               >
-                <div className="flex items-center justify-center gap-3">
-                  {isLoggingIn ? (
-                    <>
-                      <LoaderCircle className="h-5 w-5 animate-spin text-white" aria-label="Redirecting" />
-                      <span className="text-sm font-semibold tracking-wide text-white">
-                        Redirecting...
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      {/* Crisp Google Icon */}
-                      <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
-                        <path
-                          fill="#4285F4"
-                          d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"
-                        />
-                        <path
-                          fill="#34A853"
-                          d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                        />
-                        <path
-                          fill="#FBBC05"
-                          d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.03 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                        />
-                        <path
-                          fill="#EA4335"
-                          d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                        />
-                      </svg>
-                      <span className="text-sm font-semibold tracking-wide text-white">
-                        Continue with Google
-                      </span>
-                    </>
-                  )}
-                </div>
-              </ShimmerButton>
+                Continue with Google
+              </InteractiveHoverButton>
             </div>
           </div>
         )}
@@ -182,7 +160,7 @@ export default function Login() {
             End-to-End Encrypted &bull; Instant Delivery
           </span>
         </div>
-      </section>
+      </MagicCard>
     </main>
   );
 }
