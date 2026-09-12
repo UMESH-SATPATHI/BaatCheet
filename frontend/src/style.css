@@ -304,4 +304,77 @@ body,
   animation: horizontal-fill-progress 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+/* Subtle Animated Dark Gradient & Ambient Drift for Chat Area */
+@keyframes dark-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.dark-chat-gradient-canvas {
+  background: linear-gradient(
+    -45deg,
+    #0c0c11 0%,
+    #13101e 22%,
+    #0d1018 45%,
+    #161028 68%,
+    #0d0e14 85%,
+    #12101e 100%
+  );
+  background-size: 260% 260%;
+  animation: dark-gradient-shift 24s ease-in-out infinite;
+}
+
+@keyframes ambient-drift-1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translate3d(35px, -30px, 0) scale(1.12);
+    opacity: 0.22;
+  }
+}
+
+@keyframes ambient-drift-2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.10;
+  }
+  50% {
+    transform: translate3d(-30px, 25px, 0) scale(1.14);
+    opacity: 0.18;
+  }
+}
+
+@keyframes ambient-drift-3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translate3d(25px, 30px, 0) scale(0.92);
+    opacity: 0.15;
+  }
+}
+
+.animate-ambient-drift-1 {
+  animation: ambient-drift-1 18s ease-in-out infinite;
+}
+
+.animate-ambient-drift-2 {
+  animation: ambient-drift-2 22s ease-in-out infinite;
+}
+
+.animate-ambient-drift-3 {
+  animation: ambient-drift-3 20s ease-in-out infinite;
+}
+
+
 

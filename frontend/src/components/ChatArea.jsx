@@ -277,10 +277,28 @@ export default function ChatArea({ onOpenHelp }) {
   if (!selectedUser) return null;
 
   return (
-    <main className="flex-1 min-w-0 h-full max-h-[100dvh] bg-[#121214] flex flex-col relative select-none overflow-hidden">
+    <main className="flex-1 min-w-0 h-full max-h-[100dvh] flex flex-col relative select-none overflow-hidden dark-chat-gradient-canvas">
+      {/* Subtle Dark Ambient Floating Gradient Orbs & Vignette */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+        {/* Soft Ambient Theme Purple Glow (Top Right) */}
+        <div className="absolute -top-28 -right-28 w-[420px] h-[420px] rounded-full bg-[#8b5cf6]/10 blur-[130px] animate-ambient-drift-1" />
+
+        {/* Soft Ambient Deep Indigo Glow (Bottom Left) */}
+        <div className="absolute -bottom-32 -left-32 w-[440px] h-[440px] rounded-full bg-[#4f46e5]/8 blur-[140px] animate-ambient-drift-2" />
+
+        {/* Soft Ambient Midnight Violet Glow (Center) */}
+        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[#6d28d9]/7 blur-[120px] animate-ambient-drift-3" />
+
+        {/* Subtle Vignette Overlay for High Message Legibility */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,10,14,0.65)_100%)]" />
+
+        {/* Delicate Texture Pattern */}
+        <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
+      </div>
+
       {/* 1. Header Bar: Multi-Select Mode vs Normal Header (Phone icon removed) */}
       {isSelectionMode ? (
-        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#1a1a24] border-b border-zinc-800 flex items-center justify-between shrink-0 z-20 animate-in fade-in duration-150">
+        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#1a1a24]/90 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between shrink-0 z-20 animate-in fade-in duration-150">
           <div className="flex items-center gap-3">
             <button
               onClick={clearSelection}
@@ -316,7 +334,7 @@ export default function ChatArea({ onOpenHelp }) {
           </div>
         </header>
       ) : (
-        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#131316]/95 backdrop-blur-sm border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-10 relative">
+        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#131316]/90 backdrop-blur-md border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-20 relative">
           {/* Left: Back button (mobile) + User Avatar & Status */}
           <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 min-w-0">
             {/* Mobile Back Button */}
@@ -378,7 +396,7 @@ export default function ChatArea({ onOpenHelp }) {
       {/* 2. Messages Scroll Area */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto overflow-x-hidden px-2.5 sm:px-4 md:px-6 py-3 md:py-4 flex flex-col gap-3 scrollbar-thin overscroll-y-contain"
+        className="flex-1 overflow-y-auto overflow-x-hidden px-2.5 sm:px-4 md:px-6 py-3 md:py-4 flex flex-col gap-3 scrollbar-thin overscroll-y-contain relative z-10"
         style={{
           WebkitOverflowScrolling: "touch",
         }}
@@ -878,7 +896,7 @@ export default function ChatArea({ onOpenHelp }) {
       )}
 
       {/* 4. Bottom Message Input Bar */}
-      <footer className="p-2.5 sm:p-3 md:p-4 pb-safe bg-[#131316]/95 backdrop-blur-sm flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/60">
+      <footer className="p-2.5 sm:p-3 md:p-4 pb-safe bg-[#131316]/90 backdrop-blur-md flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/60 z-20">
         <input
           type="file"
           ref={fileInputRef}
