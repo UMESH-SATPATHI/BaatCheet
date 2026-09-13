@@ -9,13 +9,19 @@ import {
   CheckCircle2,
   Loader2,
   Trash2,
+  Bell,
+  BellOff,
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { useChatStore } from "../store/chatStore";
+import { requestNotificationPermission } from "../lib/notification";
 
 export default function ProfileHeader({ isOpen, onClose }) {
   const { authUser, logout, isLoggingOut, updateProfile, deleteAccount } = useAuthStore();
   const { isSoundEnabled, toggleSound } = useChatStore();
+  const [notificationPermission, setNotificationPermission] = useState(
+    () => ("Notification" in window ? Notification.permission : "denied")
+  );
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -85,6 +91,15 @@ export default function ProfileHeader({ isOpen, onClose }) {
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleEnableNotifications = async () => {
+    try {
+      await requestNotificationPermission();
+      setNotificationPermission("granted");
+    } catch (error) {
+      setNotificationPermission("denied");
     }
   };
 
@@ -201,6 +216,36 @@ export default function ProfileHeader({ isOpen, onClose }) {
               }`}
             >
               {isSoundEnabled ? "Enabled" : "Muted"}
+            </button>
+          </div>
+
+          {/* Browser Notifications Toggle */}
+          <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-8 h-8 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-400 shrink-0">
+                {notificationPermission === "granted" ? (
+                  <Bell className="w-4 h-4" />
+                ) : (
+                  <BellOff className="w-4 h-4 text-zinc-500" />
+                )}
+              </div>
+              <div>
+                <span className="font-semibold text-white block text-xs">Browser Notifications</span>
+                <span className="text-[10px] sm:text-[11px] text-zinc-400">
+                  {notificationPermission === "granted" ? "Enabled for background tabs" : "Show new messages in background"}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleEnableNotifications}
+              disabled={notificationPermission === "granted"}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 cursor-pointer ${
+                notificationPermission === "granted"
+                  ? "bg-zinc-800 text-zinc-400 cursor-default"
+                  : "bg-cyan-600 text-white hover:bg-cyan-500"
+              }`}
+            >
+              {notificationPermission === "granted" ? "Enabled" : "Enable"}
             </button>
           </div>
 

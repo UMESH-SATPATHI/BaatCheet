@@ -2,6 +2,7 @@ import { create } from "zustand";
 import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./authStore";
+import { showNotification } from "../lib/notification";
 
 const formatTime = (date) =>
   date
@@ -499,6 +500,8 @@ export const useChatStore = create((set, get) => ({
     // 1. New Incoming Message
     socket.on("newMessage", (newMessage) => {
       const { selectedUser, isSoundEnabled } = get();
+
+      showNotification(newMessage);
 
       if (isSoundEnabled) {
         playBeep(520, 0.1, "sine");
