@@ -183,24 +183,21 @@ export const sendMessage = async (req, res) => {
     let fileUrl;
 
     if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image, {
-        resource_type: "image",
-      });
-      imageUrl = uploadResponse.secure_url;
+      imageUrl = image.startsWith("http")
+        ? image
+        : (await cloudinary.uploader.upload(image, { resource_type: "image" })).secure_url;
     }
 
     if (video) {
-      const uploadResponse = await cloudinary.uploader.upload(video, {
-        resource_type: "video",
-      });
-      videoUrl = uploadResponse.secure_url;
+      videoUrl = video.startsWith("http")
+        ? video
+        : (await cloudinary.uploader.upload(video, { resource_type: "video" })).secure_url;
     }
 
     if (file) {
-      const uploadResponse = await cloudinary.uploader.upload(file, {
-        resource_type: "auto",
-      });
-      fileUrl = uploadResponse.secure_url;
+      fileUrl = file.startsWith("http")
+        ? file
+        : (await cloudinary.uploader.upload(file, { resource_type: "auto" })).secure_url;
     }
 
     // Check if receiver is online to determine initial status

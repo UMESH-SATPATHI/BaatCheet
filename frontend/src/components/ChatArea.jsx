@@ -27,6 +27,7 @@ import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
 import MediaPreviewModal from "./MediaPreviewModal";
 import { downloadMedia, formatFileSize, getMediaType } from "../lib/downloadHelper";
+import { uploadMedia } from "../lib/cloudinary";
 
 // 5 reaction emojis as requested in Item 4 (no "+" button)
 const REACTION_ICONS = ["👍", "❤️", "😂", "😮", "😢"];
@@ -77,6 +78,7 @@ export default function ChatArea({ onOpenHelp }) {
   const [previewImage, setPreviewImage] = useState(null);
   const [previewVideo, setPreviewVideo] = useState(null);
   const [previewMedia, setPreviewMedia] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [profileImageFailed, setProfileImageFailed] = useState(false);
 
   // Message action states
@@ -168,6 +170,12 @@ export default function ChatArea({ onOpenHelp }) {
     clearSelection();
   }, [selectedUser?._id, selectedUser?.profilePic]);
 
+  useEffect(() => {
+    return () => {
+      if (selectedFile?.previewUrl) URL.revokeObjectURL(selectedFile.previewUrl);
+    };
+  }, [selectedFile?.previewUrl]);
+
   // Group messages by calendar day
   const groupedMessages = useMemo(() => {
     const groups = [];
@@ -199,23 +207,37 @@ export default function ChatArea({ onOpenHelp }) {
     e?.preventDefault();
     if (!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile) return;
 
-    const payload = {
-      text: inputMessage.trim(),
-      image: previewImage || null,
-      video: previewVideo || null,
-      file: selectedFile?.dataUrl || null,
-      fileName: selectedFile?.name || null,
-      fileSize: selectedFile?.size || null,
-      fileType: selectedFile?.type || null,
-    };
+    try {
+      setIsUploading(true);
+      let uploadedUrl = null;
+      let uploadedResourceType = null;
 
-    setInputMessage("");
-    setPreviewImage(null);
-    setPreviewVideo(null);
-    setSelectedFile(null);
-    setShowEmojiMenu(false);
+      if (selectedFile?.file) {
+        const uploaded = await uploadMedia(selectedFile.file);
+        uploadedUrl = uploaded.url;
+        uploadedResourceType = uploaded.resourceType;
+      }
 
-    await sendMessage(payload);
+      await sendMessage({
+        text: inputMessage.trim(),
+        image: uploadedResourceType === "image" ? uploadedUrl : null,
+        video: uploadedResourceType === "video" ? uploadedUrl : null,
+        file: uploadedResourceType === "auto" ? uploadedUrl : null,
+        fileName: selectedFile?.name || null,
+        fileSize: selectedFile?.size || null,
+        fileType: selectedFile?.type || null,
+      });
+
+      setInputMessage("");
+      setPreviewImage(null);
+      setPreviewVideo(null);
+      setSelectedFile(null);
+      setShowEmojiMenu(false);
+    } catch (error) {
+      toast.error(error.message || "Unable to upload attachment");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -225,41 +247,19 @@ export default function ChatArea({ onOpenHelp }) {
     const mediaType = getMediaType(file.name);
     const formattedSize = formatFileSize(file.size);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const dataUrl = reader.result;
+    const previewUrl = mediaType === "image" || mediaType === "video"
+      ? URL.createObjectURL(file)
+      : null;
 
-      if (mediaType === "image") {
-        setPreviewImage(dataUrl);
-        setPreviewVideo(null);
-        setSelectedFile({
-          name: file.name,
-          size: formattedSize,
-          type: file.type,
-          dataUrl,
-        });
-      } else if (mediaType === "video") {
-        setPreviewVideo(dataUrl);
-        setPreviewImage(null);
-        setSelectedFile({
-          name: file.name,
-          size: formattedSize,
-          type: file.type,
-          dataUrl,
-        });
-      } else {
-        setSelectedFile({
-          name: file.name,
-          size: formattedSize,
-          type: file.type,
-          dataUrl,
-        });
-        setPreviewImage(null);
-        setPreviewVideo(null);
-      }
-    };
-
-    reader.readAsDataURL(file);
+    setSelectedFile({
+      file,
+      name: file.name,
+      size: formattedSize,
+      type: file.type,
+      previewUrl,
+    });
+    setPreviewImage(mediaType === "image" ? previewUrl : null);
+    setPreviewVideo(mediaType === "video" ? previewUrl : null);
     e.target.value = "";
   };
 
@@ -941,15 +941,15 @@ export default function ChatArea({ onOpenHelp }) {
           {/* Send button */}
           <button
             type="submit"
-            disabled={!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile}
+            disabled={isUploading || (!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile)}
             title="Send message"
             className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
-              inputMessage.trim() || previewImage || previewVideo || selectedFile
+              !isUploading && (inputMessage.trim() || previewImage || previewVideo || selectedFile)
                 ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white shadow-md shadow-purple-900/40 hover:scale-110 active:scale-95"
                 : "text-zinc-600 cursor-not-allowed"
             }`}
           >
-            <Send className="w-4 h-4" />
+            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>
 

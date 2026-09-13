@@ -179,7 +179,14 @@ Create a `.env` file inside the `frontend` directory:
 
 ```env
 VITE_API_URL=http://localhost:5000
+VITE_CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+VITE_CLOUDINARY_UPLOAD_PRESET=your_unsigned_upload_preset
 ```
+
+Create an unsigned upload preset in Cloudinary and restrict its allowed upload
+formats and maximum file size. The frontend uses this preset to upload media
+directly to Cloudinary, so the message API receives URLs instead of base64 file
+data.
 
 ---
 
