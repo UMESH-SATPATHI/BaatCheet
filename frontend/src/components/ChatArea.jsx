@@ -6,15 +6,11 @@ import {
   Send,
   Check,
   CheckCheck,
-  FileText,
   Image as ImageIcon,
   X,
   ArrowLeft,
   Download,
   Eye,
-  FileArchive,
-  FileSpreadsheet,
-  File,
   ChevronDown,
   Copy,
   Edit3,
@@ -26,30 +22,15 @@ import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
 import toast from "react-hot-toast";
 import MediaPreviewModal from "./MediaPreviewModal";
+import MessageItem from "./MessageItem";
 import { downloadMedia, formatFileSize, getMediaType } from "../lib/downloadHelper";
 import { uploadMedia } from "../lib/cloudinary";
-
-// 5 reaction emojis as requested in Item 4 (no "+" button)
-const REACTION_ICONS = ["👍", "❤️", "😂", "😮", "😢"];
-
-// Helper to format calendar dates for group headers
-const formatCalendarDate = (dateStr) => {
-  if (!dateStr) return "Today";
-  const date = new Date(dateStr);
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const msgDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-  if (msgDate.getTime() === today.getTime()) return "Today";
-  if (msgDate.getTime() === yesterday.getTime()) return "Yesterday";
-
-  const day = date.getDate();
-  const month = date.toLocaleDateString("en-US", { month: "short" });
-  const year = date.getFullYear();
-  return `${day} ${month} ${year}`;
-};
+import {
+  REACTION_ICONS,
+  canEditMessage,
+  formatCalendarDate,
+  getDocumentIcon,
+} from "../lib/messageUtils";
 
 export default function ChatArea({ onOpenHelp }) {
   const {
@@ -194,15 +175,6 @@ export default function ChatArea({ onOpenHelp }) {
     return groups;
   }, [messages]);
 
-  const canEditMessage = (msg) => {
-    if (!msg || msg.isDeletedForEveryone) return false;
-    const isMe = msg.senderId === "me" || msg.senderId === authUser?._id;
-    if (!isMe) return false;
-    if (!msg.createdAt) return true;
-    const diffMs = Date.now() - new Date(msg.createdAt).getTime();
-    return diffMs <= 5 * 60 * 1000; // 5 minutes
-  };
-
   const handleSendMessage = async (e) => {
     e?.preventDefault();
     if (!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile) return;
@@ -261,15 +233,6 @@ export default function ChatArea({ onOpenHelp }) {
     setPreviewImage(mediaType === "image" ? previewUrl : null);
     setPreviewVideo(mediaType === "video" ? previewUrl : null);
     e.target.value = "";
-  };
-
-  const getDocumentIcon = (name, className = "w-5 h-5") => {
-    const type = getMediaType(name);
-    if (type === "pdf") return <FileText className={`${className} text-rose-400`} />;
-    if (type === "doc") return <FileText className={`${className} text-blue-400`} />;
-    if (type === "sheet") return <FileSpreadsheet className={`${className} text-emerald-400`} />;
-    if (type === "archive") return <FileArchive className={`${className} text-amber-400`} />;
-    return <File className={`${className} text-purple-300`} />;
   };
 
   const quickEmojis = ["💜", "✨", "😂", "👍", "❤️", "🔥", "🎨", "🎉"];
@@ -436,27 +399,14 @@ export default function ChatArea({ onOpenHelp }) {
                   const isMenuOpen = activeMenuMessageId === msg._id;
 
                   return (
-                    <div
+                    <MessageItem
                       key={msg._id}
-                      className={`group flex items-center gap-2 relative ${
-                        isMe ? "justify-end" : "justify-start"
-                      }`}
+                      msg={msg}
+                      isMe={isMe}
+                      isSelectionMode={isSelectionMode}
+                      isSelected={isSelected}
+                      onSelect={toggleSelectMessage}
                     >
-                      {/* Selection Checkbox */}
-                      {isSelectionMode && (
-                        <button
-                          type="button"
-                          onClick={() => toggleSelectMessage(msg._id)}
-                          className={`w-5 h-5 rounded-md border flex items-center justify-center transition cursor-pointer shrink-0 ${
-                            isSelected
-                              ? "bg-[#8b5cf6] border-[#8b5cf6] text-white"
-                              : "border-zinc-600 hover:border-zinc-400"
-                          } ${isMe ? "order-2" : "order-first"}`}
-                        >
-                          {isSelected && <Check className="w-3.5 h-3.5" />}
-                        </button>
-                      )}
-
                       {/* Emote Button (Smiley icon on hover/touch) */}
                       {!msg.isDeletedForEveryone && !isSelectionMode && (
                         <div
@@ -554,7 +504,7 @@ export default function ChatArea({ onOpenHelp }) {
                                 )}
 
                                 {/* Edit message (within 5 min) */}
-                                {canEditMessage(msg) && (
+                                {canEditMessage(msg, authUser?._id) && (
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -825,7 +775,7 @@ export default function ChatArea({ onOpenHelp }) {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </MessageItem>
                   );
                 })}
               </div>
