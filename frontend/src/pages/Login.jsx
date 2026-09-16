@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuthStore } from "../store/authStore";
-import { MessageSquare, ShieldCheck, LogOut, Trash2, LoaderCircle } from "lucide-react";
+import { MessageSquare, ShieldCheck, LogOut, Trash2, LoaderCircle, Download } from "lucide-react";
 import {
   Particles,
   InteractiveHoverButton,
@@ -8,10 +8,12 @@ import {
   AnimatedShinyText,
   Meteors,
 } from "../components/magicui";
+import { usePWAInstall } from "../lib/PWAInstallContext";
 
 export default function Login() {
   const { authUser, loginWithGoogle, logout, deleteAccount, isLoggingIn } =
     useAuthStore();
+  const { openInstall, platform } = usePWAInstall();
 
   const handleGoogleLogin = () => {
     loginWithGoogle();
@@ -151,6 +153,17 @@ export default function Login() {
               </InteractiveHoverButton>
             </div>
           </div>
+        )}
+
+        {platform !== "installed" && (
+          <button
+            type="button"
+            onClick={openInstall}
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-500/10 py-2.5 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500/20"
+          >
+            <Download className="h-4 w-4" />
+            Install BaatCheet
+          </button>
         )}
 
         {/* Bottom Trust Badge */}
