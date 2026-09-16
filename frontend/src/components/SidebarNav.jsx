@@ -88,13 +88,9 @@ export default function SidebarNav() {
 
           {/* Settings Icon */}
           <VerticalDockIcon
-            onClick={() => setActiveTab("settings")}
+            onClick={() => setIsProfileModalOpen(true)}
             title="Settings"
-            className={`rounded-xl transition-colors cursor-pointer ${
-              activeTab === "settings"
-                ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/50"
-                : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
-            }`}
+            className="rounded-xl text-zinc-400 transition-colors cursor-pointer hover:bg-[#1a1a24] hover:text-white"
           >
             <Settings className="w-5 h-5" />
           </VerticalDockIcon>

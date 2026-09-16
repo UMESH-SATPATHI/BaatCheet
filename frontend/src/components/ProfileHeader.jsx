@@ -11,14 +11,17 @@ import {
   Trash2,
   Bell,
   BellOff,
+  Download,
 } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import { useChatStore } from "../store/chatStore";
 import { requestNotificationPermission } from "../lib/notification";
+import { usePWAInstall } from "../lib/PWAInstallContext";
 
 export default function ProfileHeader({ isOpen, onClose }) {
   const { authUser, logout, isLoggingOut, updateProfile, deleteAccount } = useAuthStore();
   const { isSoundEnabled, toggleSound } = useChatStore();
+  const { openInstall, platform } = usePWAInstall();
   const [notificationPermission, setNotificationPermission] = useState(
     () => ("Notification" in window ? Notification.permission : "denied")
   );
@@ -248,6 +251,22 @@ export default function ProfileHeader({ isOpen, onClose }) {
               {notificationPermission === "granted" ? "Enabled" : "Enable"}
             </button>
           </div>
+
+          {platform !== "installed" && (
+            <button
+              type="button"
+              onClick={openInstall}
+              className="flex w-full items-center gap-2.5 rounded-2xl border border-cyan-500/20 bg-[#121217] p-3 text-left transition hover:border-cyan-500/40"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400">
+                <Download className="h-4 w-4" />
+              </div>
+              <div>
+                <span className="block text-xs font-semibold text-white">Install BaatCheet</span>
+                <span className="text-[10px] text-zinc-400">Open messaging in its own app window</span>
+              </div>
+            </button>
+          )}
 
           {/* Security & Encryption Info */}
           <div className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
