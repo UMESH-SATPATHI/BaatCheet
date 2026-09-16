@@ -53,6 +53,7 @@ export const useChatStore = create((set, get) => ({
   searchQuery: "",
   contactSearchQuery: "",
   selectedUser: null,
+  isChatsLoading: true,
   isUserLoading: false,
   isUserTyping: false,
   isMessageLoading: false,
@@ -136,14 +137,21 @@ export const useChatStore = create((set, get) => ({
     if (user && current && String(current._id) === String(user._id)) {
       return;
     }
+    const isOnline = user
+      ? useAuthStore.getState().onlineUsers.map(String).includes(String(user._id))
+      : false;
+    const formattedUser = user
+      ? { ...user, online: isOnline, statusText: isOnline ? "online" : "offline" }
+      : null;
+
     set({
-      selectedUser: user,
+      selectedUser: formattedUser,
       messages: [],
       isSelectionMode: false,
       selectedMessageIds: [],
     });
-    if (user) {
-      get().getMessages(user._id);
+    if (formattedUser) {
+      get().getMessages(formattedUser._id);
       // Mark as read in chats list
       set((state) => ({
         chats: state.chats.map((c) =>
@@ -184,7 +192,7 @@ export const useChatStore = create((set, get) => ({
   },
 
   getMyChatPartners: async () => {
-    set({ isUserLoading: true });
+    set({ isChatsLoading: true, isUserLoading: true });
     try {
       const response = await axiosInstance.get("/messages/chats");
       if (Array.isArray(response.data)) {
@@ -220,7 +228,7 @@ export const useChatStore = create((set, get) => ({
       console.log("No chat partners loaded:", error.message);
       set({ chats: [] });
     } finally {
-      set({ isUserLoading: false });
+      set({ isChatsLoading: false, isUserLoading: false });
     }
   },
 

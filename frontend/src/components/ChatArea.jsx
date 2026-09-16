@@ -243,17 +243,20 @@ export default function ChatArea({ onOpenHelp }) {
     <main className="flex-1 min-w-0 h-full max-h-[100dvh] flex flex-col relative select-none overflow-hidden dark-chat-gradient-canvas">
       {/* Subtle Dark Ambient Floating Gradient Orbs & Vignette */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
-        {/* Soft Ambient Theme Purple Glow (Top Right) */}
-        <div className="absolute -top-28 -right-28 w-[420px] h-[420px] rounded-full bg-[#8b5cf6]/10 blur-[130px] animate-ambient-drift-1" />
+        {/* Soft Ambient Theme Lavender Glow (Top Right) */}
+        <div className="absolute -top-28 -right-28 w-[440px] h-[440px] rounded-full bg-[#a855f7]/13 blur-[140px] animate-ambient-drift-1" />
 
-        {/* Soft Ambient Deep Indigo Glow (Bottom Left) */}
-        <div className="absolute -bottom-32 -left-32 w-[440px] h-[440px] rounded-full bg-[#4f46e5]/8 blur-[140px] animate-ambient-drift-2" />
+        {/* Soft Ambient Celestial Sky/Cyan Glow (Bottom Left) */}
+        <div className="absolute -bottom-32 -left-32 w-[460px] h-[460px] rounded-full bg-[#38bdf8]/10 blur-[150px] animate-ambient-drift-2" />
 
-        {/* Soft Ambient Midnight Violet Glow (Center) */}
-        <div className="absolute top-1/2 left-1/3 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[#6d28d9]/7 blur-[120px] animate-ambient-drift-3" />
+        {/* Soft Ambient Misty Rose/Plum Glow (Center Right) */}
+        <div className="absolute top-1/3 right-1/4 w-[380px] h-[380px] rounded-full bg-[#f472b6]/8 blur-[130px] animate-ambient-drift-4" />
+
+        {/* Soft Ambient Luminous Violet Dawn Glow (Center Left) */}
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[#818cf8]/11 blur-[125px] animate-ambient-drift-3" />
 
         {/* Subtle Vignette Overlay for High Message Legibility */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,10,14,0.65)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(10,10,15,0.60)_100%)]" />
 
         {/* Delicate Texture Pattern */}
         <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
@@ -325,13 +328,27 @@ export default function ChatArea({ onOpenHelp }) {
               </div>
             </div>
 
-            <div className="flex flex-col min-w-0">
-              <h2 className="text-xs md:text-sm font-semibold text-white leading-tight truncate">
+            <div className="flex flex-col justify-center min-w-0 h-9 md:h-10">
+              <h2
+                className={`text-xs md:text-sm font-semibold text-white leading-tight truncate transition-all duration-300 ease-out ${
+                  selectedUser.online ? "-translate-y-0.5" : "translate-y-0"
+                }`}
+              >
                 {selectedUser.fullName}
               </h2>
-              <span className="text-[10px] md:text-[11px] font-medium text-[#bbb] leading-tight">
-                {selectedUser.online ? "Online" : selectedUser.statusText || "Offline"}
-              </span>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-out flex items-center gap-1.5 ${
+                  selectedUser.online
+                    ? "max-h-5 opacity-100 mt-0.5 translate-y-0"
+                    : "max-h-0 opacity-0 -translate-y-1 pointer-events-none"
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
+                <span className="text-[10px] md:text-[11px] font-medium text-emerald-400 leading-tight">
+                  Online
+                </span>
+              </div>
             </div>
           </div>
 
@@ -846,7 +863,13 @@ export default function ChatArea({ onOpenHelp }) {
       )}
 
       {/* 4. Bottom Message Input Bar */}
-      <footer className="p-2.5 sm:p-3 md:p-4 pb-safe bg-[#131316]/90 backdrop-blur-md flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/60 z-20">
+      <footer
+        className="px-3 sm:px-4 md:px-6 py-3 md:py-3.5 bg-[#131316]/90 backdrop-blur-md flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/60 z-20"
+        style={{
+          paddingTop: "0.75rem",
+          paddingBottom: "max(0.75rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)))",
+        }}
+      >
         <input
           type="file"
           ref={fileInputRef}
@@ -857,7 +880,7 @@ export default function ChatArea({ onOpenHelp }) {
 
         <form
           onSubmit={handleSendMessage}
-          className="flex-1 bg-[#222228] rounded-full px-3.5 md:px-4 py-2 md:py-2.5 flex items-center gap-2.5 md:gap-3 border border-zinc-800/80 focus-within:border-[#8b5cf6]/70 focus-within:shadow-[0_0_16px_rgba(139,92,246,0.18)] transition-all duration-200"
+          className="flex-1 min-h-[44px] md:min-h-[46px] bg-[#222228] rounded-full px-3.5 md:px-4 py-1.5 md:py-2 flex items-center gap-2.5 md:gap-3 border border-zinc-800/80 focus-within:border-[#8b5cf6]/70 focus-within:shadow-[0_0_16px_rgba(139,92,246,0.18)] transition-all duration-200"
         >
           {/* Emoji button */}
           <button
@@ -885,7 +908,7 @@ export default function ChatArea({ onOpenHelp }) {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-transparent text-xs text-white placeholder:text-zinc-500 focus:outline-none"
+            className="flex-1 bg-transparent text-xs md:text-sm text-white placeholder:text-zinc-500 focus:outline-none py-1 leading-normal"
           />
 
           {/* Send button */}
@@ -907,7 +930,7 @@ export default function ChatArea({ onOpenHelp }) {
         <button
           onClick={onOpenHelp}
           title="Help & Info"
-          className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#202028] border border-zinc-800 text-zinc-400 hover:text-white hover:bg-[#282834] flex items-center justify-center shadow-lg transition-all duration-200 cursor-pointer shrink-0"
+          className="w-9 h-9 rounded-full bg-[#202028] border border-zinc-800 text-zinc-400 hover:text-white hover:bg-[#282834] flex items-center justify-center shadow-lg transition-all duration-200 cursor-pointer shrink-0"
         >
           <span className="text-sm font-semibold">?</span>
         </button>

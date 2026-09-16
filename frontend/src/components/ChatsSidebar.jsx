@@ -8,6 +8,7 @@ import {
   CheckCheck,
   MessageSquarePlus,
   Image as ImageIcon,
+  Loader2,
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import ChatListItem from "./ChatListItem";
@@ -22,6 +23,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
     searchQuery,
     setSearchQuery,
     setActiveTab,
+    isChatsLoading,
   } = useChatStore();
 
   const [showMenu, setShowMenu] = useState(false);
@@ -108,7 +110,50 @@ export default function ChatsSidebar({ onOpenNewChat }) {
 
       {/* Chat List */}
       <div className="flex-1 min-h-0 overflow-y-auto px-2 py-2 space-y-1">
-        {filteredChats.length === 0 ? (
+        {isChatsLoading ? (
+          <div className="flex flex-col gap-1.5 px-1 py-1 animate-in fade-in duration-200" aria-label="Loading chats">
+            {/* Top status banner */}
+            <div className="flex items-center justify-between px-3 py-1 mb-0.5 text-zinc-500">
+              <span className="text-[11px] font-medium tracking-wide text-zinc-400 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#8b5cf6]" />
+                Loading chats...
+              </span>
+              <span className="text-[10px] text-zinc-600 font-mono">syncing</span>
+            </div>
+
+            {/* Skeleton chat item list */}
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="flex items-center gap-3 px-3 py-2.5 md:py-3 rounded-2xl bg-[#1d1d25]/50 border border-zinc-800/30 animate-pulse"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
+                {/* Avatar Skeleton */}
+                <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-zinc-800/80 shrink-0" />
+
+                {/* Info Column Skeleton */}
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div
+                      className="h-3.5 bg-zinc-800/90 rounded-md"
+                      style={{ width: `${i % 3 === 0 ? 115 : i % 2 === 0 ? 90 : 135}px` }}
+                    />
+                    <div className="h-2.5 w-9 bg-zinc-800/60 rounded-md" />
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div
+                      className="h-2.5 bg-zinc-800/50 rounded-md"
+                      style={{ width: `${i % 2 === 0 ? 140 : 175}px` }}
+                    />
+                    {i === 2 && (
+                      <div className="w-4 h-4 rounded-full bg-purple-900/40 shrink-0" />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredChats.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
             <div className="w-12 h-12 rounded-2xl bg-[#202028] flex items-center justify-center text-zinc-500 mb-3">
               <MessageSquarePlus className="w-6 h-6" />
