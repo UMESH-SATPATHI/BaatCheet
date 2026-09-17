@@ -132,10 +132,12 @@ export const getMessages = async (req, res) => {
 
     // Mask deleted messages
     const sanitizedMessages = messages.map((msg) => {
+      const message = msg.toObject();
       if (msg.isDeletedForEveryone) {
         return {
-          ...msg,
+          ...message,
           text: "🚫 This message was deleted",
+          reactions: [],
           image: null,
           video: null,
           fileUrl: null,
@@ -143,7 +145,7 @@ export const getMessages = async (req, res) => {
           fileSize: null,
         };
       }
-      return msg;
+      return message;
     });
 
     res.status(200).json(sanitizedMessages);
@@ -277,6 +279,7 @@ export const deleteMessageForEveryone = async (req, res) => {
 
     message.isDeletedForEveryone = true;
     message.text = "🚫 This message was deleted";
+    message.reactions = [];
     message.image = null;
     message.video = null;
     message.fileUrl = null;
@@ -323,6 +326,7 @@ export const deleteMultipleMessages = async (req, res) => {
         {
           isDeletedForEveryone: true,
           text: "🚫 This message was deleted",
+          reactions: [],
           image: null,
           video: null,
           fileUrl: null,
@@ -429,6 +433,10 @@ export const reactToMessage = async (req, res) => {
     const message = await Message.findById(id);
     if (!message) {
       return res.status(404).json({ error: "Message not found" });
+    }
+
+    if (message.isDeletedForEveryone) {
+      return res.status(400).json({ error: "Cannot react to a deleted message" });
     }
 
     const existingIndex = message.reactions.findIndex(

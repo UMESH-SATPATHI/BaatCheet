@@ -15,7 +15,7 @@ export default function MessageItem({
         isMe ? "justify-end" : "justify-start"
       }`}
     >
-      {isSelectionMode && (
+      {isSelectionMode && !msg.isDeletedForEveryone && (
         <button
           type="button"
           onClick={() => onSelect(msg._id)}

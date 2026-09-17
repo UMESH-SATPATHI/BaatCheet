@@ -68,8 +68,11 @@ export const useChatStore = create((set, get) => ({
   },
 
   toggleSelectMessage: (id) => {
-    const { selectedMessageIds } = get();
+    const { selectedMessageIds, messages } = get();
     const strId = String(id);
+    const message = messages.find((item) => String(item._id) === strId);
+    if (message?.isDeletedForEveryone) return;
+
     if (selectedMessageIds.includes(strId)) {
       const next = selectedMessageIds.filter((item) => item !== strId);
       set({
@@ -354,6 +357,10 @@ export const useChatStore = create((set, get) => ({
   toggleReaction: async (messageId, emoji) => {
     const myId = useAuthStore.getState().authUser?._id;
     if (!myId) return;
+    const message = get().messages.find(
+      (item) => String(item._id) === String(messageId)
+    );
+    if (message?.isDeletedForEveryone) return;
 
     // Optimistic reaction update
     set((state) => ({
@@ -433,6 +440,7 @@ export const useChatStore = create((set, get) => ({
               ...m,
               text: "🚫 This message was deleted",
               isDeletedForEveryone: true,
+              reactions: [],
               image: null,
               video: null,
               fileUrl: null,
@@ -461,6 +469,7 @@ export const useChatStore = create((set, get) => ({
                 ...m,
                 text: "🚫 This message was deleted",
                 isDeletedForEveryone: true,
+                reactions: [],
                 image: null,
                 video: null,
                 fileUrl: null,
@@ -616,6 +625,7 @@ export const useChatStore = create((set, get) => ({
                 ...m,
                 isDeletedForEveryone: true,
                 text: text || "🚫 This message was deleted",
+                reactions: [],
                 image: null,
                 video: null,
                 fileUrl: null,
