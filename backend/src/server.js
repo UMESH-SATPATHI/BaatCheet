@@ -9,6 +9,7 @@ import passport from "./lib/passport.js";
 
 import { connectDB } from "./lib/db.js";
 import { app, server } from "./lib/socket.js";
+import { arcjetMiddleware } from "./middleware/arcjet.middleware.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 
@@ -48,6 +49,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/api", arcjetMiddleware);
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
