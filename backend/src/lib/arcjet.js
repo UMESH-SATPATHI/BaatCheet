@@ -3,25 +3,27 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const mode = process.env.ARCJET_MODE === "LIVE" ? "LIVE" : "DRY_RUN";
+
 export const arcjetProtection = process.env.ARCJET_KEY
   ? arcjet({
       key: process.env.ARCJET_KEY,
       characteristics: ["ip.src"],
       rules: [
-        shield({ mode: "LIVE" }),
+        shield({ mode }),
         detectBot({
-          mode: "LIVE",
+          mode,
           allow: ["CATEGORY:SEARCH_ENGINE"],
         }),
         tokenBucket({
-          mode: "LIVE",
-          refillRate: 5,
+          mode,
+          refillRate: 10,
           interval: 10,
-          capacity: 10,
+          capacity: 50,
         }),
         slidingWindow({
-          mode: "LIVE",
-          max: 100,
+          mode,
+          max: 200,
           interval: 60,
         }),
       ],

@@ -5,6 +5,11 @@ export const arcjetMiddleware = async (req, res, next) => {
     return next();
   }
 
+  // Never block essential authentication routes
+  if (req.path.startsWith("/auth")) {
+    return next();
+  }
+
   try {
     const decision = await arcjetProtection.protect(req, { requested: 1 });
 

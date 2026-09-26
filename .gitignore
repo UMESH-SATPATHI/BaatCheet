@@ -22,3 +22,6 @@ npm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+.postman/
+postman/
+.github/
