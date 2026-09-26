@@ -1,10 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://baatcheet-qzcs.onrender.com/api/:path*"
-    },
-    {
       "source": "/((?!manifest\\.webmanifest|sw\\.js|workbox-.*|assets/.*|pwa-.*\\.svg|favicon\\.svg).*)",
       "destination": "/index.html"
     }
