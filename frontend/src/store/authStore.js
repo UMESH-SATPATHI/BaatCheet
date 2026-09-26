@@ -15,11 +15,24 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get("token");
+        if (urlToken) {
+          localStorage.setItem("token", urlToken);
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      }
+
       const res = await axiosInstance.get("/auth/check");
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
       console.log("Error in authCheck:", error);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -37,10 +50,17 @@ export const useAuthStore = create((set, get) => ({
 
     try {
       await axiosInstance.post("/auth/logout");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
       set({ authUser: null });
       toast.success("Logged out successfully");
       get().disconnectSocket();
     } catch (error) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
+      set({ authUser: null });
       toast.error("Error logging out");
       console.log("Logout error:", error);
     } finally {
@@ -51,6 +71,9 @@ export const useAuthStore = create((set, get) => ({
   deleteAccount: async () => {
     try {
       await axiosInstance.delete("/auth/delete");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+      }
       get().disconnectSocket();
       set({ authUser: null });
       toast.success("Account deleted successfully");
