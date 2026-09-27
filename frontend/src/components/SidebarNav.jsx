@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
-import ProfileHeader from "./profileHeader";
+import ProfileHeader from "./ProfileHeader";
 
 export default function SidebarNav() {
   const {
