@@ -20,13 +20,13 @@ export default function MessageItem({
           type="button"
           onClick={() => onSelect(msg._id)}
           aria-label={`Select message ${msg._id}`}
-          className={`w-5 h-5 rounded-md border flex items-center justify-center transition cursor-pointer shrink-0 ${
+          className={`w-4 h-4 rounded border flex items-center justify-center transition cursor-pointer shrink-0 ${
             isSelected
-              ? "bg-[#8b5cf6] border-[#8b5cf6] text-white"
-              : "border-zinc-600 hover:border-zinc-400"
+              ? "bg-indigo-600 border-indigo-600 text-white"
+              : "border-zinc-700 hover:border-zinc-500 bg-zinc-800/40"
           } ${isMe ? "order-2" : "order-first"}`}
         >
-          {isSelected && <Check className="w-3.5 h-3.5" />}
+          {isSelected && <Check className="w-3 h-3" />}
         </button>
       )}
       {children}

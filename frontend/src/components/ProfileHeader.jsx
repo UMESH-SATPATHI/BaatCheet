@@ -109,56 +109,50 @@ export default function ProfileHeader({ isOpen, onClose }) {
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 z-50 transition-opacity duration-200 ease-out ${
+      className={`fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 transition-opacity duration-150 ease-out ${
         isAnimating ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`border border-zinc-800 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 sm:gap-5 transition-all duration-200 ease-out overflow-hidden backdrop-blur-xl ${
+        className={`border border-zinc-800 bg-[#16161b] w-full max-w-md rounded-2xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 transition-all duration-150 ease-out overflow-hidden ${
           isAnimating
             ? "opacity-100 scale-100 translate-y-0"
-            : "opacity-0 scale-95 translate-y-2 pointer-events-none"
+            : "opacity-0 scale-98 translate-y-1 pointer-events-none"
         }`}
-        style={{
-          backgroundColor: "rgba(23, 23, 30, 0.9)",
-          boxShadow: "0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px -10px rgba(139, 92, 246, 0.2)",
-        }}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
           title="Close (Esc)"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 rounded-full bg-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-700 flex items-center justify-center transition cursor-pointer"
+          className="absolute top-4 right-4 w-7 h-7 rounded-lg bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-800 flex items-center justify-center transition cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Modal Title */}
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">Your Profile</h2>
-          <p className="text-xs text-zinc-400">Manage your profile and account settings</p>
+          <h2 className="text-sm font-semibold text-zinc-100">Settings</h2>
+          <p className="text-xs text-zinc-400 mt-0.5">Profile & preferences</p>
         </div>
 
         {/* Profile Avatar Card */}
-        <div className="flex flex-col items-center p-4 sm:p-5 bg-[#121217] rounded-2xl border border-zinc-800/80 relative">
+        <div className="flex flex-col items-center p-4 bg-[#1b1b22] rounded-xl border border-zinc-800/80 relative">
           <div className="relative group">
-            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 p-0.5 shadow-xl">
-              <div className="w-full h-full rounded-full bg-[#17171e] overflow-hidden flex items-center justify-center text-white text-lg sm:text-xl font-bold">
-                {authUser?.profilePic ? (
-                  <img
-                    src={authUser.profilePic}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  initials
-                )}
-              </div>
+            <div className="w-16 h-16 rounded-full bg-zinc-800 ring-1 ring-zinc-700/80 overflow-hidden flex items-center justify-center text-zinc-200 text-base font-semibold">
+              {authUser?.profilePic ? (
+                <img
+                  src={authUser.profilePic}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                initials
+              )}
             </div>
 
             {/* Online Badge */}
-            <span className="absolute bottom-1 right-1 w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-[#22d3ee] ring-2 ring-[#121217] online-dot" />
+            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-[#1b1b22]" />
 
             {/* Change Photo Overlay Button */}
             <button
@@ -170,9 +164,9 @@ export default function ProfileHeader({ isOpen, onClose }) {
               }`}
             >
               {isUploading ? (
-                <Loader2 className="w-5 h-5 animate-spin text-purple-400" />
+                <Loader2 className="w-4 h-4 animate-spin text-zinc-200" />
               ) : (
-                <Camera className="w-5 h-5" />
+                <Camera className="w-4 h-4 text-zinc-200" />
               )}
             </button>
             <input
@@ -184,37 +178,37 @@ export default function ProfileHeader({ isOpen, onClose }) {
             />
           </div>
 
-          <h3 className="text-sm sm:text-base font-bold text-white mt-3 leading-tight">
+          <h3 className="text-sm font-medium text-zinc-100 mt-2.5 leading-tight">
             {authUser?.fullName || "User"}
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">{authUser?.email || "online"}</p>
 
-          <div className="mt-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-[11px] font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
-            <span>Google Account Connected</span>
+          <div className="mt-2.5 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-[11px] font-medium">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            <span>Connected</span>
           </div>
         </div>
 
         {/* Preferences & Settings */}
-        <div className="space-y-2 text-xs">
+        <div className="space-y-1.5 text-xs">
           {/* Sound Notifications Toggle */}
-          <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-400 shrink-0">
-                {isSoundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4 text-zinc-500" />}
+          <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
+                {isSoundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
               </div>
               <div>
-                <span className="font-semibold text-white block text-xs">Message Sounds</span>
-                <span className="text-[10px] sm:text-[11px] text-zinc-400">
+                <span className="font-medium text-zinc-200 block text-xs">Message Sounds</span>
+                <span className="text-[11px] text-zinc-400">
                   {isSoundEnabled ? "Sound effects active" : "Sounds muted"}
                 </span>
               </div>
             </div>
             <button
               onClick={toggleSound}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
                 isSoundEnabled
-                  ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/30 hover:bg-[#7c3aed]"
+                  ? "bg-zinc-700 text-white hover:bg-zinc-600"
                   : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
               }`}
             >
@@ -223,29 +217,29 @@ export default function ProfileHeader({ isOpen, onClose }) {
           </div>
 
           {/* Browser Notifications Toggle */}
-          <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-400 shrink-0">
+          <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
                 {notificationPermission === "granted" ? (
-                  <Bell className="w-4 h-4" />
+                  <Bell className="w-3.5 h-3.5" />
                 ) : (
-                  <BellOff className="w-4 h-4 text-zinc-500" />
+                  <BellOff className="w-3.5 h-3.5 text-zinc-500" />
                 )}
               </div>
               <div>
-                <span className="font-semibold text-white block text-xs">Browser Notifications</span>
-                <span className="text-[10px] sm:text-[11px] text-zinc-400">
-                  {notificationPermission === "granted" ? "Enabled for background tabs" : "Show new messages in background"}
+                <span className="font-medium text-zinc-200 block text-xs">Browser Notifications</span>
+                <span className="text-[11px] text-zinc-400">
+                  {notificationPermission === "granted" ? "Enabled for background tabs" : "Notify for new messages"}
                 </span>
               </div>
             </div>
             <button
               onClick={handleEnableNotifications}
               disabled={notificationPermission === "granted"}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
                 notificationPermission === "granted"
                   ? "bg-zinc-800 text-zinc-400 cursor-default"
-                  : "bg-cyan-600 text-white hover:bg-cyan-500"
+                  : "bg-indigo-600 text-white hover:bg-indigo-500"
               }`}
             >
               {notificationPermission === "granted" ? "Enabled" : "Enable"}
@@ -256,26 +250,26 @@ export default function ProfileHeader({ isOpen, onClose }) {
             <button
               type="button"
               onClick={openInstall}
-              className="flex w-full items-center gap-2.5 rounded-2xl border border-cyan-500/20 bg-[#121217] p-3 text-left transition hover:border-cyan-500/40"
+              className="flex w-full items-center gap-2.5 rounded-xl border border-zinc-800 bg-[#1b1b22] p-2.5 text-left transition hover:border-zinc-700"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 text-cyan-400">
-                <Download className="h-4 w-4" />
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300">
+                <Download className="h-3.5 w-3.5" />
               </div>
               <div>
-                <span className="block text-xs font-semibold text-white">Install BaatCheet</span>
-                <span className="text-[10px] text-zinc-400">Open messaging in its own app window</span>
+                <span className="block text-xs font-medium text-zinc-200">Install BaatCheet</span>
+                <span className="text-[11px] text-zinc-400">Run in standalone window</span>
               </div>
             </button>
           )}
 
           {/* Security & Encryption Info */}
-          <div className="flex items-center gap-2.5 sm:gap-3 p-3 sm:p-3.5 rounded-2xl bg-[#121217] border border-zinc-800/80">
-            <div className="w-8 h-8 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-400 shrink-0">
-              <ShieldCheck className="w-4 h-4" />
+          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+            <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 shrink-0">
+              <ShieldCheck className="w-3.5 h-3.5" />
             </div>
             <div>
-              <span className="font-semibold text-white block text-xs">Protected Connection</span>
-              <span className="text-[10px] sm:text-[11px] text-zinc-400">
+              <span className="font-medium text-zinc-200 block text-xs">End-to-End Encryption</span>
+              <span className="text-[11px] text-zinc-400">
                 All messages and media transfers are encrypted.
               </span>
             </div>
@@ -283,31 +277,31 @@ export default function ProfileHeader({ isOpen, onClose }) {
         </div>
 
         {/* Danger Zone / Log Out Action */}
-        <div className="pt-1 sm:pt-2 flex flex-col gap-2">
+        <div className="pt-1 flex flex-col gap-2">
           <button
             onClick={logout}
             disabled={isLoggingOut}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-2xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 font-semibold text-xs border border-rose-500/20 transition-colors duration-150 cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs border border-zinc-700/60 transition cursor-pointer"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-3.5 h-3.5" />
             <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
           </button>
 
           {!showDeleteConfirm ? (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="text-[11px] text-zinc-500 hover:text-rose-400 transition-colors duration-150 cursor-pointer text-center py-1"
+              className="text-[11px] text-zinc-500 hover:text-rose-400 transition cursor-pointer text-center py-0.5"
             >
               Delete account
             </button>
           ) : (
-            <div className="p-3 bg-rose-950/20 border border-rose-900/40 rounded-2xl flex flex-col gap-2 text-center">
+            <div className="p-2.5 bg-rose-950/20 border border-rose-900/40 rounded-xl flex flex-col gap-2 text-center">
               <p className="text-[11px] text-rose-300 font-medium">Are you sure? This cannot be undone.</p>
               <div className="flex items-center justify-center gap-2">
                 <button
                   onClick={handleDeleteAccount}
                   disabled={isDeleting}
-                  className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl transition cursor-pointer flex items-center gap-1.5"
+                  className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium rounded-lg transition cursor-pointer flex items-center gap-1.5"
                 >
                   {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   <span>{isDeleting ? "Deleting..." : "Yes, delete"}</span>
@@ -315,7 +309,7 @@ export default function ProfileHeader({ isOpen, onClose }) {
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={isDeleting}
-                  className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold rounded-xl transition cursor-pointer"
+                  className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg transition cursor-pointer"
                 >
                   Cancel
                 </button>

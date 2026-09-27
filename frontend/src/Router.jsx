@@ -26,8 +26,8 @@ export default function Router() {
 
   if (isCheckingAuth) {
     return (
-      <div className="flex min-h-screen items-center justify-center" role="status" aria-label="Checking authentication">
-        <LoaderCircle className="animate-spin" size={32} />
+      <div className="flex min-h-screen items-center justify-center bg-[#0e0e11] text-zinc-400" role="status" aria-label="Checking authentication">
+        <LoaderCircle className="animate-spin text-zinc-400" size={28} />
       </div>
     );
   }

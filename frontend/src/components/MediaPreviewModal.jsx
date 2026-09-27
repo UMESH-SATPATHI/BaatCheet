@@ -76,18 +76,18 @@ export default function MediaPreviewModal({ media, onClose }) {
       }}
     >
       {/* Top Header Bar */}
-      <header className="h-16 px-4 md:px-6 bg-[#121216]/90 border-b border-zinc-800/80 flex items-center justify-between shrink-0 z-10">
+      <header className="h-14 px-4 md:px-6 bg-[#141418] border-b border-[#202026] flex items-center justify-between shrink-0 z-10">
         {/* Left: File Info */}
         <div className="flex items-center gap-3 min-w-0 pr-4">
-          <div className="w-9 h-9 rounded-xl bg-zinc-800/90 border border-zinc-700/60 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700/60 flex items-center justify-center shrink-0">
             {renderFileIcon()}
           </div>
           <div className="flex flex-col min-w-0">
-            <h3 className="text-sm font-semibold text-white truncate max-w-xs sm:max-w-md md:max-w-lg">
+            <h3 className="text-xs sm:text-sm font-medium text-zinc-100 truncate max-w-xs sm:max-w-md md:max-w-lg">
               {fileName}
             </h3>
             {media.size && (
-              <span className="text-[11px] text-zinc-400 font-medium">
+              <span className="text-[10px] text-zinc-400">
                 {media.size}
               </span>
             )}
@@ -95,33 +95,33 @@ export default function MediaPreviewModal({ media, onClose }) {
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {/* Zoom controls for images */}
           {detectedType === "image" && (
-            <div className="hidden sm:flex items-center bg-zinc-800/90 border border-zinc-700/60 rounded-xl p-0.5 mr-1">
+            <div className="hidden sm:flex items-center bg-zinc-800/80 border border-zinc-700/60 rounded-lg p-0.5 mr-1">
               <button
                 onClick={() => setZoomLevel((prev) => Math.max(prev - 0.25, 0.5))}
                 title="Zoom Out (-)"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition cursor-pointer"
+                className="w-7 h-7 rounded flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition cursor-pointer"
               >
-                <ZoomOut className="w-4 h-4" />
+                <ZoomOut className="w-3.5 h-3.5" />
               </button>
-              <span className="text-[11px] font-semibold text-zinc-300 px-2 min-w-[42px] text-center">
+              <span className="text-[11px] font-medium text-zinc-300 px-2 min-w-[38px] text-center">
                 {Math.round(zoomLevel * 100)}%
               </span>
               <button
                 onClick={() => setZoomLevel((prev) => Math.min(prev + 0.25, 3))}
                 title="Zoom In (+)"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition cursor-pointer"
+                className="w-7 h-7 rounded flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition cursor-pointer"
               >
-                <ZoomIn className="w-4 h-4" />
+                <ZoomIn className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setZoomLevel(1)}
                 title="Reset Zoom (0)"
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700/60 transition cursor-pointer ml-0.5"
+                className="w-7 h-7 rounded flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-700 transition cursor-pointer ml-0.5"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-3 h-3" />
               </button>
             </div>
           )}
@@ -130,18 +130,18 @@ export default function MediaPreviewModal({ media, onClose }) {
           <button
             onClick={handleOpenExternal}
             title="Open in new window"
-            className="w-9 h-9 rounded-xl bg-zinc-800/90 border border-zinc-700/60 text-zinc-300 hover:text-white hover:bg-zinc-700 hover:scale-105 active:scale-95 flex items-center justify-center transition cursor-pointer"
+            className="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 flex items-center justify-center transition cursor-pointer"
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-3.5 h-3.5" />
           </button>
 
           {/* Download button */}
           <button
             onClick={handleDownload}
             title="Download file"
-            className="flex items-center gap-1.5 px-3 h-9 rounded-xl bg-[#8b5cf6] hover:bg-[#7c3aed] text-white text-xs font-semibold shadow-md shadow-purple-900/40 hover:scale-105 active:scale-95 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 h-8 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition cursor-pointer"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Download</span>
           </button>
 
@@ -149,7 +149,7 @@ export default function MediaPreviewModal({ media, onClose }) {
           <button
             onClick={onClose}
             title="Close (Esc)"
-            className="w-9 h-9 rounded-xl bg-zinc-800/90 border border-zinc-700/60 text-zinc-400 hover:text-white hover:bg-zinc-700 hover:scale-105 active:scale-95 flex items-center justify-center transition cursor-pointer ml-1"
+            className="w-8 h-8 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-700 flex items-center justify-center transition cursor-pointer ml-1"
           >
             <X className="w-4 h-4" />
           </button>

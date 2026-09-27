@@ -10,7 +10,6 @@ import {
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
 import ProfileHeader from "./ProfileHeader";
-import { VerticalDock, VerticalDockIcon } from "./magicui";
 
 export default function SidebarNav() {
   const { activeTab, setActiveTab, isSoundEnabled, toggleSound } = useChatStore();
@@ -20,126 +19,114 @@ export default function SidebarNav() {
   // Get user initials
   const initials = authUser?.fullName
     ? authUser.fullName
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .substring(0, 2)
-      .toUpperCase()
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase()
     : "ME";
 
   return (
-    <aside className="w-[56px] sm:w-[62px] md:w-[70px] h-full max-h-[100dvh] bg-[#101014] border-r border-[#1f1f26] flex flex-col items-center justify-between py-2.5 sm:py-3 md:py-4 select-none shrink-0 z-20 overflow-y-auto overflow-x-hidden scrollbar-none">
-      {/* Top Section: Brand Logo & Nav Icons with Vertical Dock Magnification */}
-      <div className="flex flex-col items-center gap-3 sm:gap-4 md:gap-5 w-full shrink-0">
+    <aside className="w-[58px] md:w-[64px] h-full max-h-[100dvh] bg-[#121215] border-r border-[#202026] flex flex-col items-center justify-between py-3 select-none shrink-0 z-20">
+      {/* Top Section: App Logo & Main Nav Items */}
+      <div className="flex flex-col items-center gap-4 w-full">
         {/* Brand App Logo */}
         <button
           onClick={() => setActiveTab("chats")}
           title="BaatCheet"
-          className="w-10 h-10 sm:w-10 sm:h-10 md:w-11 md:h-11 bg-gradient-to-tr from-[#7c3aed] to-[#9333ea] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-900/40 hover:rotate-3 hover:shadow-purple-500/50 active:scale-95 transition-all duration-200 cursor-pointer"
+          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700/90 text-zinc-100 flex items-center justify-center transition-colors cursor-pointer"
         >
-          <MessageSquare className="w-5 h-5 md:w-6 md:h-6 text-white fill-white" />
+          <MessageSquare className="w-4 h-4 text-indigo-400" />
         </button>
 
-        {/* Navigation List with Vertical Dock Magnification */}
-        <VerticalDock
-          magnification={52}
-          distance={110}
-          baseSize={40}
-          className="gap-2 sm:gap-2.5 w-full px-1"
-        >
-          {/* Chats Icon */}
-          <VerticalDockIcon
+        {/* Navigation Rail */}
+        <nav className="flex flex-col items-center gap-1.5 w-full px-2" aria-label="Main Navigation">
+          {/* Chats */}
+          <button
             onClick={() => setActiveTab("chats")}
             title="Chats"
-            className={`rounded-xl transition-colors cursor-pointer ${
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
               activeTab === "chats"
-                ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/50"
-                : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
+                ? "bg-zinc-800 text-white font-medium"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
             }`}
           >
-            <MessageSquare className="w-5 h-5" />
-          </VerticalDockIcon>
+            <MessageSquare className="w-[18px] h-[18px]" />
+          </button>
 
-          {/* Contacts / Users Icon */}
-          <VerticalDockIcon
+          {/* Contacts */}
+          <button
             onClick={() => setActiveTab("contacts")}
             title="Contacts"
-            className={`rounded-xl transition-colors cursor-pointer ${
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
               activeTab === "contacts"
-                ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/50"
-                : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
+                ? "bg-zinc-800 text-white font-medium"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
             }`}
           >
-            <Users className="w-5 h-5" />
-          </VerticalDockIcon>
+            <Users className="w-[18px] h-[18px]" />
+          </button>
 
-          {/* Documents / Files Icon */}
-          <VerticalDockIcon
+          {/* Files */}
+          <button
             onClick={() => setActiveTab("files")}
             title="Files"
-            className={`rounded-xl transition-colors cursor-pointer ${
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
               activeTab === "files"
-                ? "bg-[#8b5cf6] text-white shadow-md shadow-purple-900/50"
-                : "text-zinc-400 hover:text-white hover:bg-[#1a1a24]"
+                ? "bg-zinc-800 text-white font-medium"
+                : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
             }`}
           >
-            <FileText className="w-5 h-5" />
-          </VerticalDockIcon>
+            <FileText className="w-[18px] h-[18px]" />
+          </button>
 
-          {/* Settings Icon */}
-          <VerticalDockIcon
+          {/* Settings */}
+          <button
             onClick={() => setIsProfileModalOpen(true)}
             title="Settings"
-            className="rounded-xl text-zinc-400 transition-colors cursor-pointer hover:bg-[#1a1a24] hover:text-white"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors cursor-pointer"
           >
-            <Settings className="w-5 h-5" />
-          </VerticalDockIcon>
-        </VerticalDock>
+            <Settings className="w-[18px] h-[18px]" />
+          </button>
+        </nav>
       </div>
 
-      {/* Bottom Section: Volume & User Profile with Vertical Dock Magnification */}
-      <div className="flex flex-col items-center gap-2 relative shrink-0 pb-safe pt-2 w-full">
-        <VerticalDock
-          magnification={48}
-          distance={90}
-          baseSize={38}
-          className="gap-2.5 w-full px-1"
+      {/* Bottom Section: Sound & User Profile */}
+      <div className="flex flex-col items-center gap-3 w-full pb-safe pt-2">
+        {/* Sound Toggle */}
+        <button
+          onClick={toggleSound}
+          title={isSoundEnabled ? "Mute sounds" : "Unmute sounds"}
+          className="w-9 h-9 rounded-xl text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 flex items-center justify-center transition-colors cursor-pointer"
         >
-          {/* Sound Toggle */}
-          <VerticalDockIcon
-            onClick={toggleSound}
-            title={isSoundEnabled ? "Mute sounds" : "Unmute sounds"}
-            className="rounded-xl text-zinc-400 hover:text-white hover:bg-[#202028]"
+          {isSoundEnabled ? (
+            <Volume2 className="w-4 h-4 text-zinc-300" />
+          ) : (
+            <VolumeX className="w-4 h-4 text-zinc-500" />
+          )}
+        </button>
+
+        {/* User Avatar with quiet online dot */}
+        <div className="relative">
+          <button
+            onClick={() => setIsProfileModalOpen(true)}
+            title="Your Profile"
+            className="w-8 h-8 rounded-full bg-zinc-800 text-zinc-200 text-xs font-semibold overflow-hidden flex items-center justify-center cursor-pointer ring-1 ring-zinc-700/60 hover:ring-zinc-500 transition-all"
           >
-            {isSoundEnabled ? (
-              <Volume2 className="w-5 h-5 text-purple-400" />
+            {authUser?.profilePic ? (
+              <img
+                src={authUser.profilePic}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <VolumeX className="w-5 h-5 text-zinc-500" />
+              initials
             )}
-          </VerticalDockIcon>
+          </button>
 
-          {/* User Avatar with status dot */}
-          <div className="relative flex items-center justify-center">
-            <VerticalDockIcon
-              onClick={() => setIsProfileModalOpen(true)}
-              title="Your Profile"
-              className="rounded-full bg-[#8b5cf6] text-white text-xs font-bold overflow-hidden shadow-md ring-1 ring-purple-400/40"
-            >
-              {authUser?.profilePic ? (
-                <img
-                  src={authUser.profilePic}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                initials
-              )}
-            </VerticalDockIcon>
-
-            {/* Cyan Online Status Dot */}
-            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#22d3ee] ring-2 ring-[#101014] online-dot pointer-events-none" />
-          </div>
-        </VerticalDock>
+          {/* Subtle Online Status Dot */}
+          <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#121215] pointer-events-none" />
+        </div>
       </div>
 
       {/* Profile Header Modal */}
@@ -150,3 +137,4 @@ export default function SidebarNav() {
     </aside>
   );
 }
+

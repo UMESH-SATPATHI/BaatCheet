@@ -52,35 +52,30 @@ export default function ChatsSidebar({ onOpenNewChat }) {
   );
 
   return (
-    <aside className="w-full sm:w-[300px] md:w-[310px] lg:w-[340px] flex-1 sm:flex-initial h-full max-h-[100dvh] bg-[#17171c] border-r border-[#22222b] flex flex-col select-none shrink-0 z-10 overflow-hidden">
+    <aside className="w-full sm:w-[300px] md:w-[310px] lg:w-[330px] flex-1 sm:flex-initial h-full max-h-[100dvh] bg-[#141418] border-r border-[#202026] flex flex-col select-none shrink-0 z-10 overflow-hidden">
       {/* Header */}
-      <div className="px-4 md:px-5 pt-4 pb-2 flex flex-col shrink-0">
+      <div className="px-4 pt-3.5 pb-2.5 flex flex-col shrink-0">
         <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[10px] tracking-widest text-zinc-400 uppercase font-semibold">
-              BaatCheet
-            </span>
-            <div className="flex items-center gap-2 mt-1">
-              <h1 className="text-lg md:text-xl font-bold text-white tracking-tight leading-none">
-                Chats
-              </h1>
-              {totalUnreadCount > 0 && (
-                <span className="px-2 py-0.5 text-[10px] font-bold bg-[#8b5cf6] text-white rounded-full shadow-sm animate-in zoom-in-75 duration-150">
-                  {totalUnreadCount}
-                </span>
-              )}
-            </div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-base font-semibold text-zinc-100 tracking-tight">
+              Chats
+            </h1>
+            {totalUnreadCount > 0 && (
+              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-zinc-800 text-zinc-300 rounded-full border border-zinc-700/60">
+                {totalUnreadCount}
+              </span>
+            )}
           </div>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 relative">
+          <div className="flex items-center gap-1 relative">
             <button
               onClick={() => {
                 if (onOpenNewChat) onOpenNewChat();
                 else setActiveTab("contacts");
               }}
               title="New Chat"
-              className="w-8 h-8 rounded-xl bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-md shadow-purple-900/30 transition-colors duration-150 cursor-pointer"
+              className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/70 flex items-center justify-center transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -88,7 +83,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
             <button
               onClick={() => setShowMenu(!showMenu)}
               title="More options"
-              className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition-colors duration-150 cursor-pointer"
+              className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/70 flex items-center justify-center transition-colors cursor-pointer"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -96,70 +91,59 @@ export default function ChatsSidebar({ onOpenNewChat }) {
         </div>
 
         {/* Search Bar */}
-        <div className="mt-3 bg-[#24242c] rounded-3xl flex items-center px-3.5 py-2.5 gap-2.5 border border-zinc-800/80 focus-within:border-[#8b5cf6]/70 focus-within:shadow-[0_0_12px_rgba(139,92,246,0.18)] transition-all duration-200">
-          <Search className="w-4 h-4 text-zinc-400 shrink-0" />
+        <div className="mt-3 bg-[#1b1b22] rounded-lg flex items-center px-3 py-2 gap-2 border border-zinc-800/80 focus-within:border-zinc-700 transition-colors">
+          <Search className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search or start chat"
-            className="bg-transparent text-xs text-white placeholder:text-zinc-500 focus:outline-none w-full"
+            className="bg-transparent text-xs text-zinc-200 placeholder:text-zinc-500 focus:outline-none w-full"
           />
         </div>
       </div>
 
       {/* Chat List */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-2 py-2 space-y-1">
+      <div className="flex-1 min-h-0 overflow-y-auto px-2 py-1 space-y-0.5">
         {isChatsLoading ? (
-          <div className="flex flex-col gap-1.5 px-1 py-1 animate-in fade-in duration-200" aria-label="Loading chats">
-            {/* Top status banner */}
-            <div className="flex items-center justify-between px-3 py-1 mb-0.5 text-zinc-500">
-              <span className="text-[11px] font-medium tracking-wide text-zinc-400 flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#8b5cf6]" />
+          <div className="flex flex-col gap-1 px-1 py-1" aria-label="Loading chats">
+            <div className="flex items-center justify-between px-2 py-1 text-zinc-500 text-xs">
+              <span className="flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-zinc-400" />
                 Loading chats...
               </span>
-              <span className="text-[10px] text-zinc-600 font-mono">syncing</span>
             </div>
 
             {/* Skeleton chat item list */}
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 px-3 py-2.5 md:py-3 rounded-2xl bg-[#1d1d25]/50 border border-zinc-800/30 animate-pulse"
-                style={{ animationDelay: `${i * 100}ms` }}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-zinc-800/20 border border-zinc-800/30"
               >
-                {/* Avatar Skeleton */}
-                <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-zinc-800/80 shrink-0" />
-
-                {/* Info Column Skeleton */}
+                <div className="w-9 h-9 rounded-full bg-zinc-800/60 shrink-0" />
                 <div className="flex-1 min-w-0 space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <div
-                      className="h-3.5 bg-zinc-800/90 rounded-md"
-                      style={{ width: `${i % 3 === 0 ? 115 : i % 2 === 0 ? 90 : 135}px` }}
+                      className="h-3 bg-zinc-800/80 rounded"
+                      style={{ width: `${i % 3 === 0 ? 100 : 120}px` }}
                     />
-                    <div className="h-2.5 w-9 bg-zinc-800/60 rounded-md" />
+                    <div className="h-2 w-8 bg-zinc-800/60 rounded" />
                   </div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div
-                      className="h-2.5 bg-zinc-800/50 rounded-md"
-                      style={{ width: `${i % 2 === 0 ? 140 : 175}px` }}
-                    />
-                    {i === 2 && (
-                      <div className="w-4 h-4 rounded-full bg-purple-900/40 shrink-0" />
-                    )}
-                  </div>
+                  <div
+                    className="h-2.5 bg-zinc-800/40 rounded"
+                    style={{ width: `${i % 2 === 0 ? 130 : 160}px` }}
+                  />
                 </div>
               </div>
             ))}
           </div>
         ) : filteredChats.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-[#202028] flex items-center justify-center text-zinc-500 mb-3">
-              <MessageSquarePlus className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-800/50 flex items-center justify-center text-zinc-500 mb-2">
+              <MessageSquarePlus className="w-5 h-5" />
             </div>
-            <p className="text-xs font-semibold text-zinc-400">No chats yet</p>
-            <p className="text-[11px] text-zinc-500 mt-1 max-w-[200px]">
+            <p className="text-xs font-medium text-zinc-400">No chats yet</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5 max-w-[190px]">
               {searchQuery ? "No chats matching your search" : "Your recent chats will appear here"}
             </p>
           </div>
@@ -176,9 +160,9 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                   setActiveTab("chats");
                 }}
               >
-                {/* Avatar with Online Dot */}
+                {/* Avatar with Quiet Status Dot */}
                 <div className="relative shrink-0">
-                  <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
+                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-200 text-xs font-medium overflow-hidden">
                     {chat.profilePic && !failedProfilePics.has(chat._id) ? (
                       <img
                         src={chat.profilePic}
@@ -198,7 +182,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
 
                   {/* Online Badge */}
                   {chat.online && (
-                    <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#22d3ee] ring-2 ring-[#17171c] online-dot" />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[#141418]" />
                   )}
                 </div>
 
@@ -206,19 +190,19 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                 <div className="flex-1 min-w-0">
                   {/* Top line: Pin + Name + Time */}
                   <div className="flex items-center justify-between gap-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="flex items-center gap-1 min-w-0">
                       {chat.isPinned && (
-                        <Pin className="w-3 h-3 text-[#a855f7] fill-[#a855f7] -rotate-45 shrink-0" />
+                        <Pin className="w-3 h-3 text-zinc-400 fill-zinc-400 -rotate-45 shrink-0" />
                       )}
-                      <span className="text-xs md:text-sm font-semibold text-zinc-100 truncate group-hover:text-white transition-colors">
+                      <span className="text-xs md:text-sm font-medium text-zinc-200 truncate group-hover:text-white">
                         {chat.fullName}
                       </span>
                     </div>
                     <span
-                      className={`text-[10px] md:text-[11px] shrink-0 font-medium transition-colors ${
+                      className={`text-[11px] shrink-0 ${
                         (chat.unreadCount || 0) > 0
-                          ? "text-[#22d3ee] font-bold"
-                          : "text-zinc-400"
+                          ? "text-zinc-200 font-medium"
+                          : "text-zinc-500"
                       }`}
                     >
                       {chat.lastMessageTime || ""}
@@ -226,9 +210,9 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                   </div>
 
                   {/* Bottom line: Last Message Snippet + Unread Badge */}
-                  <div className="flex items-center justify-between gap-2 mt-1">
+                  <div className="flex items-center justify-between gap-2 mt-0.5">
                     <p
-                      className={`text-[11px] md:text-xs truncate flex-1 leading-snug transition-colors ${
+                      className={`text-xs truncate flex-1 leading-snug ${
                         (chat.unreadCount || 0) > 0
                           ? "text-zinc-200 font-medium"
                           : "text-zinc-400 group-hover:text-zinc-300"
@@ -245,7 +229,7 @@ export default function ChatsSidebar({ onOpenNewChat }) {
                     </p>
 
                     {(chat.unreadCount || 0) > 0 && (
-                      <span className="bg-[#8b5cf6] text-white text-[10px] font-extrabold min-w-[18px] h-[18px] px-1.5 rounded-full flex items-center justify-center shrink-0 shadow-sm shadow-purple-950/40 animate-in zoom-in-75 duration-150">
+                      <span className="bg-indigo-600 text-white text-[10px] font-medium min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center shrink-0">
                         {chat.unreadCount}
                       </span>
                     )}
@@ -259,3 +243,4 @@ export default function ChatsSidebar({ onOpenNewChat }) {
     </aside>
   );
 }
+

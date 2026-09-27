@@ -240,40 +240,19 @@ export default function ChatArea({ onOpenHelp }) {
   if (!selectedUser) return null;
 
   return (
-    <main className="flex-1 min-w-0 h-full max-h-[100dvh] flex flex-col relative select-none overflow-hidden dark-chat-gradient-canvas">
-      {/* Subtle Dark Ambient Floating Gradient Orbs & Vignette */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
-        {/* Soft Ambient Theme Lavender Glow (Top Right) */}
-        <div className="absolute -top-28 -right-28 w-[440px] h-[440px] rounded-full bg-[#a855f7]/13 blur-[140px] animate-ambient-drift-1" />
-
-        {/* Soft Ambient Celestial Sky/Cyan Glow (Bottom Left) */}
-        <div className="absolute -bottom-32 -left-32 w-[460px] h-[460px] rounded-full bg-[#38bdf8]/10 blur-[150px] animate-ambient-drift-2" />
-
-        {/* Soft Ambient Misty Rose/Plum Glow (Center Right) */}
-        <div className="absolute top-1/3 right-1/4 w-[380px] h-[380px] rounded-full bg-[#f472b6]/8 blur-[130px] animate-ambient-drift-4" />
-
-        {/* Soft Ambient Luminous Violet Dawn Glow (Center Left) */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[360px] h-[360px] rounded-full bg-[#818cf8]/11 blur-[125px] animate-ambient-drift-3" />
-
-        {/* Subtle Vignette Overlay for High Message Legibility */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(10,10,15,0.60)_100%)]" />
-
-        {/* Delicate Texture Pattern */}
-        <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:24px_24px]" />
-      </div>
-
-      {/* 1. Header Bar: Multi-Select Mode vs Normal Header (Phone icon removed) */}
+    <main className="flex-1 min-w-0 h-full max-h-[100dvh] flex flex-col relative select-none overflow-hidden bg-[#0e0e11]">
+      {/* 1. Header Bar: Multi-Select Mode vs Normal Header */}
       {isSelectionMode ? (
-        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#1a1a24]/90 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between shrink-0 z-20 animate-in fade-in duration-150">
+        <header className="h-14 md:h-15 px-3 sm:px-4 md:px-6 bg-[#141418] border-b border-[#202026] flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
             <button
               onClick={clearSelection}
               title="Close selection"
-              className="w-8 h-8 rounded-full hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition cursor-pointer"
+              className="w-7 h-7 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-xs font-medium text-zinc-200">
               {selectedMessageIds.length} selected
             </span>
           </div>
@@ -282,7 +261,7 @@ export default function ChatArea({ onOpenHelp }) {
             <button
               onClick={() => deleteMultipleMessages(selectedMessageIds, "me")}
               disabled={selectedMessageIds.length === 0}
-              className="px-3 py-1.5 bg-[#202028] hover:bg-[#282834] text-xs font-semibold text-zinc-200 rounded-xl transition cursor-pointer border border-zinc-700/60"
+              className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 rounded-lg transition cursor-pointer border border-zinc-700/50"
             >
               Delete for me
             </button>
@@ -293,27 +272,27 @@ export default function ChatArea({ onOpenHelp }) {
                 }
               }}
               disabled={selectedMessageIds.length === 0}
-              className="px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 text-xs font-semibold text-rose-300 rounded-xl transition cursor-pointer border border-rose-500/30"
+              className="px-3 py-1.5 bg-rose-950/40 hover:bg-rose-900/50 text-xs font-medium text-rose-300 rounded-lg transition cursor-pointer border border-rose-900/50"
             >
               Delete for everyone
             </button>
           </div>
         </header>
       ) : (
-        <header className="h-14 md:h-16 px-3 sm:px-4 md:px-6 bg-[#131316]/90 backdrop-blur-md border-b border-zinc-800/60 flex items-center justify-between shrink-0 z-20 relative">
+        <header className="h-14 md:h-15 px-3 sm:px-4 md:px-6 bg-[#121215] border-b border-[#202026] flex items-center justify-between shrink-0 z-20 relative">
           {/* Left: Back button (mobile) + User Avatar & Status */}
-          <div className="flex items-center gap-2 sm:gap-2.5 md:gap-3 min-w-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
             {/* Mobile Back Button */}
             <button
               onClick={() => setSelectedUser(null)}
               title="Back to chats"
-              className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-zinc-800/80 rounded-xl transition-colors cursor-pointer shrink-0"
+              className="md:hidden p-1.5 -ml-1 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors cursor-pointer shrink-0"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
 
             <div className="relative shrink-0">
-              <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-[#8b5cf6] flex items-center justify-center text-white text-xs font-bold shadow-sm overflow-hidden">
+              <div className="w-9 h-9 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-200 text-xs font-medium overflow-hidden">
                 {selectedUser.profilePic && !profileImageFailed ? (
                   <img
                     src={selectedUser.profilePic}
@@ -328,36 +307,34 @@ export default function ChatArea({ onOpenHelp }) {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center min-w-0 h-9 md:h-10">
-              <h2
-                className={`text-xs md:text-sm font-semibold text-white leading-tight truncate transition-all duration-300 ease-out ${
-                  selectedUser.online ? "-translate-y-0.5" : "translate-y-0"
-                }`}
-              >
+            <div className="flex flex-col justify-center min-w-0">
+              <h2 className="text-xs md:text-sm font-medium text-zinc-100 leading-tight truncate">
                 {selectedUser.fullName}
               </h2>
 
-              <div
-                className={`overflow-hidden transition-all duration-300 ease-out flex items-center gap-1.5 ${
-                  selectedUser.online
-                    ? "max-h-5 opacity-100 mt-0.5 translate-y-0"
-                    : "max-h-0 opacity-0 -translate-y-1 pointer-events-none"
-                }`}
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
-                <span className="text-[10px] md:text-[11px] font-medium text-emerald-400 leading-tight">
-                  Online
-                </span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {selectedUser.online ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                    <span className="text-[11px] font-normal text-zinc-400 leading-tight">
+                      Online
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[11px] font-normal text-zinc-500 leading-tight">
+                    Offline
+                  </span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-1.5 md:gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => toast("Search in conversation", { icon: "🔍" })}
               title="Search conversation"
-              className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 flex items-center justify-center transition-colors cursor-pointer"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -365,13 +342,14 @@ export default function ChatArea({ onOpenHelp }) {
             <button
               onClick={() => setIsSelectionMode(true)}
               title="Select messages"
-              className="w-8 h-8 rounded-xl text-zinc-400 hover:text-white hover:bg-[#202028] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 flex items-center justify-center transition-colors cursor-pointer"
             >
               <CheckSquare className="w-4 h-4" />
             </button>
           </div>
         </header>
       )}
+
 
       {/* 2. Messages Scroll Area */}
       <div
@@ -400,10 +378,10 @@ export default function ChatArea({ onOpenHelp }) {
 
             {/* Calendar Date Grouped Message List */}
             {groupedMessages.map((group) => (
-              <div key={group.label} className="flex flex-col gap-2.5">
+              <div key={group.label} className="flex flex-col gap-2">
                 {/* Sticky Calendar Day Divider Pill */}
-                <div className="flex justify-center my-2 sticky top-1 z-10 pointer-events-none">
-                  <span className="bg-[#1c1c24]/90 backdrop-blur-md text-zinc-400 text-[11px] font-medium px-3.5 py-1 rounded-full shadow-md border border-zinc-800/80">
+                <div className="flex justify-center my-1.5 sticky top-1 z-10 pointer-events-none">
+                  <span className="bg-[#18181f]/95 text-zinc-400 text-[11px] font-medium px-2.5 py-0.5 rounded-full border border-zinc-800/80">
                     {group.label}
                   </span>
                 </div>
@@ -439,18 +417,18 @@ export default function ChatArea({ onOpenHelp }) {
                               setActiveMenuMessageId(null);
                             }}
                             title="React"
-                            className="w-7 h-7 rounded-full bg-[#1e1e26] hover:bg-[#282834] text-zinc-400 hover:text-purple-300 flex items-center justify-center transition cursor-pointer shadow-md border border-zinc-800/60"
+                            className="w-6 h-6 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 flex items-center justify-center transition cursor-pointer border border-zinc-700/40"
                           >
-                            <Smile className="w-4 h-4" />
+                            <Smile className="w-3.5 h-3.5" />
                           </button>
 
-                          {/* 5 Reaction Icons Floating Bar */}
+                          {/* Reaction Icons Floating Bar */}
                           {isReactionOpen && (
                             <div
                               onClick={(e) => e.stopPropagation()}
                               className={`absolute bottom-full mb-1.5 ${
                                 isMe ? "right-0" : "left-0"
-                              } z-40 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#17171e] border border-zinc-800 shadow-2xl animate-in zoom-in-90 duration-150 backdrop-blur-md`}
+                              } z-40 flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#18181f] border border-zinc-800 shadow-xl`}
                             >
                               {REACTION_ICONS.map((emoji) => (
                                 <button
@@ -460,7 +438,7 @@ export default function ChatArea({ onOpenHelp }) {
                                     toggleReaction(msg._id, emoji);
                                     setActiveReactionMessageId(null);
                                   }}
-                                  className="text-lg hover:scale-130 active:scale-95 transition-transform cursor-pointer p-0.5"
+                                  className="text-base hover:scale-125 transition-transform cursor-pointer p-0.5"
                                 >
                                   {emoji}
                                 </button>
@@ -470,13 +448,13 @@ export default function ChatArea({ onOpenHelp }) {
                         </div>
                       )}
 
-                      {/* Message Bubble Container (Project Theme: Purple for outgoing, Dark card for incoming) */}
+                      {/* Message Bubble Container */}
                       <div
-                        className={`relative rounded-2xl p-2.5 sm:p-3 text-xs leading-relaxed max-w-[85%] sm:max-w-[75%] md:max-w-[70%] shadow-md select-text transition-colors duration-150 ${
+                        className={`relative rounded-2xl px-3 py-2 text-[13px] leading-relaxed max-w-[85%] sm:max-w-[75%] md:max-w-[68%] select-text transition-colors duration-150 ${
                           isMe
-                            ? "bg-[#8b5cf6] text-white rounded-tr-xs shadow-purple-950/20"
-                            : "bg-[#222228] text-zinc-100 rounded-tl-xs border border-zinc-800/80"
-                        } ${isSelected ? "ring-2 ring-purple-400" : ""}`}
+                            ? "bg-[#38334c] text-white rounded-tr-xs"
+                            : "bg-[#1e1e24] text-zinc-100 rounded-tl-xs border border-zinc-800/60"
+                        } ${isSelected ? "ring-1 ring-indigo-400/80" : ""}`}
                       >
                         {/* Downward Chevron Arrow inside bubble on hover */}
                         {!msg.isDeletedForEveryone && !isSelectionMode && (
@@ -489,7 +467,7 @@ export default function ChatArea({ onOpenHelp }) {
                                 setActiveReactionMessageId(null);
                               }}
                               title="Message options"
-                              className={`w-5 h-5 rounded-full bg-black/20 hover:bg-black/40 text-purple-100 hover:text-white flex items-center justify-center transition cursor-pointer ${
+                              className={`w-5 h-5 rounded hover:bg-black/30 text-zinc-300 hover:text-white flex items-center justify-center transition cursor-pointer ${
                                 isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                               }`}
                             >
@@ -502,7 +480,7 @@ export default function ChatArea({ onOpenHelp }) {
                                 onClick={(e) => e.stopPropagation()}
                                 className={`absolute top-6 ${
                                   isMe ? "right-0" : "left-0"
-                                } z-40 w-48 rounded-2xl bg-[#17171e] border border-zinc-800 shadow-2xl py-1.5 text-xs text-zinc-200 flex flex-col animate-in zoom-in-95 duration-150 backdrop-blur-md`}
+                                } z-40 w-44 rounded-xl bg-[#1c1c22] border border-zinc-800 shadow-xl py-1 text-xs text-zinc-200 flex flex-col`}
                               >
                                 {/* Copy */}
                                 {msg.text && (
@@ -513,7 +491,7 @@ export default function ChatArea({ onOpenHelp }) {
                                       toast.success("Message copied");
                                       setActiveMenuMessageId(null);
                                     }}
-                                    className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-purple-500/10 hover:text-purple-300 transition cursor-pointer text-left"
+                                    className="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800/80 hover:text-white transition cursor-pointer text-left"
                                   >
                                     <Copy className="w-4 h-4 text-zinc-400" />
                                     <span>Copy</span>
@@ -529,7 +507,7 @@ export default function ChatArea({ onOpenHelp }) {
                                       setEditingText(msg.text || "");
                                       setActiveMenuMessageId(null);
                                     }}
-                                    className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-purple-500/10 hover:text-purple-300 transition cursor-pointer text-left"
+                                    className="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800/80 hover:text-white transition cursor-pointer text-left"
                                   >
                                     <Edit3 className="w-4 h-4 text-zinc-400" />
                                     <span>Edit message</span>
@@ -544,7 +522,7 @@ export default function ChatArea({ onOpenHelp }) {
                                     setIsSelectionMode(true);
                                     setActiveMenuMessageId(null);
                                   }}
-                                  className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-purple-500/10 hover:text-purple-300 transition cursor-pointer text-left"
+                                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800/80 hover:text-white transition cursor-pointer text-left"
                                 >
                                   <CheckSquare className="w-4 h-4 text-zinc-400" />
                                   <span>Select</span>
@@ -557,7 +535,7 @@ export default function ChatArea({ onOpenHelp }) {
                                     deleteForMe(msg._id);
                                     setActiveMenuMessageId(null);
                                   }}
-                                  className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-purple-500/10 hover:text-purple-300 transition cursor-pointer text-left text-zinc-300"
+                                  className="flex items-center gap-2.5 px-3 py-2 hover:bg-zinc-800/80 hover:text-white transition cursor-pointer text-left text-zinc-300"
                                 >
                                   <Trash2 className="w-4 h-4 text-zinc-400" />
                                   <span>Delete for me</span>
@@ -573,7 +551,7 @@ export default function ChatArea({ onOpenHelp }) {
                                       }
                                       setActiveMenuMessageId(null);
                                     }}
-                                    className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-rose-500/10 transition cursor-pointer text-left text-rose-400 hover:text-rose-300"
+                                    className="flex items-center gap-2.5 px-3 py-2 hover:bg-rose-500/10 transition cursor-pointer text-left text-rose-400 hover:text-rose-300"
                                   >
                                     <Trash2 className="w-4 h-4 text-rose-400" />
                                     <span>Delete for everyone</span>
@@ -608,7 +586,7 @@ export default function ChatArea({ onOpenHelp }) {
                                   }
                                   className="w-full h-auto object-cover max-h-72 rounded-xl cursor-pointer hover:brightness-105 transition"
                                 />
-                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-black/65 backdrop-blur-md p-1 rounded-xl">
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-black/60 p-1 rounded-lg">
                                   <button
                                     type="button"
                                     onClick={(e) => {
@@ -620,7 +598,7 @@ export default function ChatArea({ onOpenHelp }) {
                                         size: msg.fileSize,
                                       });
                                     }}
-                                    className="w-7 h-7 rounded-lg bg-white/15 hover:bg-white/30 text-white flex items-center justify-center transition cursor-pointer"
+                                    className="w-7 h-7 rounded-md bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
                                   >
                                     <Eye className="w-3.5 h-3.5" />
                                   </button>
@@ -630,7 +608,7 @@ export default function ChatArea({ onOpenHelp }) {
                                       e.stopPropagation();
                                       downloadMedia(msg.image, msg.fileName || "Photo.jpg");
                                     }}
-                                    className="w-7 h-7 rounded-lg bg-[#8b5cf6] text-white flex items-center justify-center transition cursor-pointer shadow"
+                                    className="w-7 h-7 rounded-md bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition cursor-pointer"
                                   >
                                     <Download className="w-3.5 h-3.5" />
                                   </button>
@@ -652,15 +630,15 @@ export default function ChatArea({ onOpenHelp }) {
 
                             {/* Document / File Card */}
                             {(msg.fileUrl || msg.file) && (
-                              <div className="bg-black/25 p-2.5 rounded-xl flex items-center gap-3 text-white mb-1 min-w-[220px]">
-                                <div className="w-9 h-9 rounded-lg bg-black/30 flex items-center justify-center shrink-0">
+                              <div className="bg-black/25 p-2.5 rounded-xl flex items-center gap-3 text-white mb-1 min-w-[200px] border border-white/5">
+                                <div className="w-8 h-8 rounded-lg bg-black/30 flex items-center justify-center shrink-0">
                                   {getDocumentIcon(msg.fileName || msg.file?.name)}
                                 </div>
                                 <div className="flex flex-col min-w-0 flex-1 pr-1">
-                                  <span className="font-semibold text-xs text-white truncate">
+                                  <span className="font-medium text-xs text-white truncate">
                                     {msg.fileName || msg.file?.name || "Document"}
                                   </span>
-                                  <span className="text-[10px] text-zinc-300">
+                                  <span className="text-[10px] text-zinc-400">
                                     {msg.fileSize || msg.file?.size || "Attachment"}
                                   </span>
                                 </div>
@@ -672,7 +650,7 @@ export default function ChatArea({ onOpenHelp }) {
                                       msg.fileName || msg.file?.name || "Document"
                                     )
                                   }
-                                  className="w-7 h-7 rounded-lg bg-[#8b5cf6] hover:bg-[#7c3aed] text-white flex items-center justify-center transition cursor-pointer"
+                                  className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 flex items-center justify-center transition cursor-pointer"
                                 >
                                   <Download className="w-3.5 h-3.5" />
                                 </button>
@@ -686,7 +664,7 @@ export default function ChatArea({ onOpenHelp }) {
                                   type="text"
                                   value={editingText}
                                   onChange={(e) => setEditingText(e.target.value)}
-                                  className="bg-[#17171e] text-white text-xs px-2.5 py-1.5 rounded-xl border border-zinc-700 focus:outline-none focus:border-[#8b5cf6]"
+                                  className="bg-[#17171e] text-white text-xs px-2.5 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-zinc-500"
                                   autoFocus
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -709,21 +687,21 @@ export default function ChatArea({ onOpenHelp }) {
                                       editMessage(msg._id, editingText);
                                       setEditingMessageId(null);
                                     }}
-                                    className="px-3 py-1 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white text-[11px] font-semibold rounded-lg cursor-pointer shadow"
+                                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-medium rounded-lg cursor-pointer"
                                   >
                                     Save
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              /* Fix 2: Message Text with INLINE Timing & Status in Right Corner */
+                              /* Message Text with INLINE Timing & Status */
                               msg.text && (
                                 <div className="break-words select-text">
                                   <span>{msg.text}</span>
                                   {/* Inline timing tag on right corner */}
                                   <span
                                     className={`float-right inline-flex items-center gap-1 pl-2.5 pt-0.5 text-[10px] select-none pointer-events-none ${
-                                      isMe ? "text-purple-200" : "text-zinc-400"
+                                      isMe ? "text-zinc-300/80" : "text-zinc-500"
                                     }`}
                                   >
                                     {msg.isEdited && (
@@ -736,17 +714,17 @@ export default function ChatArea({ onOpenHelp }) {
                                       <span className="inline-flex items-center ml-0.5">
                                         {msg.status === "read" ? (
                                           <CheckCheck
-                                            className="w-3.5 h-3.5 text-[#22d3ee]"
+                                            className="w-3.5 h-3.5 text-sky-400"
                                             title="Read"
                                           />
                                         ) : msg.status === "delivered" ? (
                                           <CheckCheck
-                                            className="w-3.5 h-3.5 text-purple-200"
+                                            className="w-3.5 h-3.5 text-zinc-300"
                                             title="Delivered"
                                           />
                                         ) : (
                                           <Check
-                                            className="w-3.5 h-3.5 text-purple-200"
+                                            className="w-3.5 h-3.5 text-zinc-300"
                                             title="Sent"
                                           />
                                         )}
@@ -781,8 +759,8 @@ export default function ChatArea({ onOpenHelp }) {
                                       ? "Click to remove reaction"
                                       : `Reacted with ${r.emoji}`
                                   }
-                                  className={`flex items-center justify-center rounded-full bg-[#181820] border border-zinc-800 px-1.5 py-0.5 shadow-md text-xs hover:scale-110 active:scale-95 transition-transform cursor-pointer ${
-                                    isMyReaction ? "ring-1 ring-purple-400" : ""
+                                  className={`flex items-center justify-center rounded-full bg-[#18181f] border border-zinc-800 px-1.5 py-0.5 text-xs transition cursor-pointer ${
+                                    isMyReaction ? "ring-1 ring-indigo-400/60" : ""
                                   }`}
                                 >
                                   <span>{r.emoji}</span>
@@ -804,25 +782,25 @@ export default function ChatArea({ onOpenHelp }) {
 
       {/* 3. Media Preview Bar Before Sending */}
       {(previewImage || previewVideo || selectedFile) && (
-        <div className="mx-3 sm:mx-6 p-2.5 bg-[#181820] border border-zinc-800 rounded-2xl flex items-center justify-between mb-2 animate-in fade-in slide-in-from-bottom-2 duration-150">
+        <div className="mx-3 sm:mx-6 p-2.5 bg-[#16161b] border border-zinc-800 rounded-xl flex items-center justify-between mb-2">
           <div className="flex items-center gap-3 min-w-0">
             {previewImage ? (
               <img
                 src={previewImage}
                 alt="Preview"
-                className="w-12 h-12 rounded-xl object-cover border border-zinc-700 shrink-0"
+                className="w-11 h-11 rounded-lg object-cover border border-zinc-700 shrink-0"
               />
             ) : previewVideo ? (
-              <div className="w-12 h-12 rounded-xl bg-purple-950/40 border border-purple-700/40 flex items-center justify-center shrink-0 text-purple-400">
+              <div className="w-11 h-11 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0 text-zinc-300">
                 <ImageIcon className="w-5 h-5" />
               </div>
             ) : (
-              <div className="w-12 h-12 rounded-xl bg-[#202028] border border-zinc-800 flex items-center justify-center shrink-0">
-                {getDocumentIcon(selectedFile?.name, "w-6 h-6")}
+              <div className="w-11 h-11 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center shrink-0">
+                {getDocumentIcon(selectedFile?.name, "w-5 h-5")}
               </div>
             )}
             <div className="flex flex-col min-w-0">
-              <span className="text-xs font-semibold text-white truncate">
+              <span className="text-xs font-medium text-white truncate">
                 {selectedFile?.name || (previewImage ? "Photo" : "Video")}
               </span>
               <span className="text-[10px] text-zinc-400">
@@ -837,7 +815,7 @@ export default function ChatArea({ onOpenHelp }) {
               setPreviewVideo(null);
               setSelectedFile(null);
             }}
-            className="w-7 h-7 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer"
+            className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -846,7 +824,7 @@ export default function ChatArea({ onOpenHelp }) {
 
       {/* Quick emoji palette popover */}
       {showEmojiMenu && (
-        <div className="absolute bottom-16 left-4 z-30 bg-[#181820] border border-zinc-800 rounded-2xl p-2.5 shadow-2xl flex items-center gap-1.5 animate-in zoom-in-90 duration-150">
+        <div className="absolute bottom-16 left-4 z-30 bg-[#18181f] border border-zinc-800 rounded-xl p-2 shadow-xl flex items-center gap-1">
           {quickEmojis.map((emoji) => (
             <button
               key={emoji}
@@ -854,7 +832,7 @@ export default function ChatArea({ onOpenHelp }) {
                 setInputMessage((prev) => prev + emoji);
                 setShowEmojiMenu(false);
               }}
-              className="w-8 h-8 rounded-xl hover:bg-[#282834] flex items-center justify-center text-base hover:scale-125 transition-transform cursor-pointer"
+              className="w-7 h-7 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-sm transition cursor-pointer"
             >
               {emoji}
             </button>
@@ -864,10 +842,10 @@ export default function ChatArea({ onOpenHelp }) {
 
       {/* 4. Bottom Message Input Bar */}
       <footer
-        className="px-3 sm:px-4 md:px-6 py-3 md:py-3.5 bg-[#131316]/90 backdrop-blur-md flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-zinc-800/60 z-20"
+        className="px-3 sm:px-4 md:px-6 py-2.5 md:py-3 bg-[#121215] flex items-center gap-2 md:gap-3 shrink-0 relative border-t border-[#202026] z-20"
         style={{
-          paddingTop: "0.75rem",
-          paddingBottom: "max(0.75rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)))",
+          paddingTop: "0.65rem",
+          paddingBottom: "max(0.65rem, calc(0.65rem + env(safe-area-inset-bottom, 0px)))",
         }}
       >
         <input
@@ -880,16 +858,16 @@ export default function ChatArea({ onOpenHelp }) {
 
         <form
           onSubmit={handleSendMessage}
-          className="flex-1 min-h-[44px] md:min-h-[46px] bg-[#222228] rounded-full px-3.5 md:px-4 py-1.5 md:py-2 flex items-center gap-2.5 md:gap-3 border border-zinc-800/80 focus-within:border-[#8b5cf6]/70 focus-within:shadow-[0_0_16px_rgba(139,92,246,0.18)] transition-all duration-200"
+          className="flex-1 min-h-[40px] md:min-h-[42px] bg-[#1a1a20] rounded-xl px-3.5 py-1.5 flex items-center gap-2 md:gap-2.5 border border-zinc-800/80 focus-within:border-zinc-700 transition-colors"
         >
           {/* Emoji button */}
           <button
             type="button"
             onClick={() => setShowEmojiMenu(!showEmojiMenu)}
             title="Insert emoji"
-            className="text-zinc-400 hover:text-yellow-400 hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
+            className="text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer shrink-0"
           >
-            <Smile className="w-5 h-5" />
+            <Smile className="w-4 h-4" />
           </button>
 
           {/* Paperclip attachment */}
@@ -897,9 +875,9 @@ export default function ChatArea({ onOpenHelp }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             title="Attach photo, video or document"
-            className="text-zinc-400 hover:text-purple-400 hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer shrink-0"
+            className="text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer shrink-0"
           >
-            <Paperclip className="w-5 h-5" />
+            <Paperclip className="w-4 h-4" />
           </button>
 
           {/* Message input */}
@@ -908,7 +886,7 @@ export default function ChatArea({ onOpenHelp }) {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-transparent text-xs md:text-sm text-white placeholder:text-zinc-500 focus:outline-none py-1 leading-normal"
+            className="flex-1 bg-transparent text-xs md:text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none py-1 leading-normal"
           />
 
           {/* Send button */}
@@ -916,13 +894,13 @@ export default function ChatArea({ onOpenHelp }) {
             type="submit"
             disabled={isUploading || (!inputMessage.trim() && !previewImage && !previewVideo && !selectedFile)}
             title="Send message"
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer shrink-0 ${
+            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors cursor-pointer shrink-0 ${
               !isUploading && (inputMessage.trim() || previewImage || previewVideo || selectedFile)
-                ? "bg-[#8b5cf6] hover:bg-[#7c3aed] text-white shadow-md shadow-purple-900/40 hover:scale-110 active:scale-95"
+                ? "bg-indigo-600 hover:bg-indigo-500 text-white"
                 : "text-zinc-600 cursor-not-allowed"
             }`}
           >
-            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
           </button>
         </form>
 
@@ -930,9 +908,9 @@ export default function ChatArea({ onOpenHelp }) {
         <button
           onClick={onOpenHelp}
           title="Help & Info"
-          className="w-9 h-9 rounded-full bg-[#202028] border border-zinc-800 text-zinc-400 hover:text-white hover:bg-[#282834] flex items-center justify-center shadow-lg transition-all duration-200 cursor-pointer shrink-0"
+          className="w-8 h-8 rounded-lg bg-zinc-800/60 border border-zinc-800/80 text-zinc-400 hover:text-white hover:bg-zinc-800 flex items-center justify-center transition-colors cursor-pointer shrink-0"
         >
-          <span className="text-sm font-semibold">?</span>
+          <span className="text-xs font-semibold">?</span>
         </button>
       </footer>
 
