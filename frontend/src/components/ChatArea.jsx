@@ -52,6 +52,7 @@ export default function ChatArea({ onOpenHelp }) {
     setIsSelectionMode,
     setActiveTab,
     setMediaContactFilter,
+    openDownloadModal,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
@@ -651,8 +652,14 @@ export default function ChatArea({ onOpenHelp }) {
                                     type="button"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      downloadMedia(msg.image, msg.fileName || "Photo.jpg");
+                                      openDownloadModal({
+                                        url: msg.image,
+                                        name: msg.fileName || "Photo.jpg",
+                                        size: msg.fileSize,
+                                        type: "image",
+                                      });
                                     }}
+                                    title="Download image"
                                     className="w-7 h-7 rounded-md bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition cursor-pointer"
                                   >
                                     <Download className="w-3.5 h-3.5" />
@@ -663,13 +670,47 @@ export default function ChatArea({ onOpenHelp }) {
 
                             {/* Video Attachment */}
                             {msg.video && (
-                              <div className="relative rounded-xl overflow-hidden mb-1 max-w-sm bg-black">
+                              <div className="relative rounded-xl overflow-hidden mb-1 max-w-sm bg-black group">
                                 <video
                                   src={msg.video}
                                   controls
                                   playsInline
                                   className="w-full h-auto max-h-72 rounded-xl"
                                 />
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-black/60 p-1 rounded-lg">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPreviewMedia({
+                                        type: "video",
+                                        url: msg.video,
+                                        name: msg.fileName || "Video.mp4",
+                                        size: msg.fileSize,
+                                      });
+                                    }}
+                                    title="Expand video"
+                                    className="w-7 h-7 rounded-md bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      openDownloadModal({
+                                        url: msg.video,
+                                        name: msg.fileName || "Video.mp4",
+                                        size: msg.fileSize,
+                                        type: "video",
+                                      });
+                                    }}
+                                    title="Download video"
+                                    className="w-7 h-7 rounded-md bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition cursor-pointer"
+                                  >
+                                    <Download className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
                               </div>
                             )}
 
@@ -690,11 +731,14 @@ export default function ChatArea({ onOpenHelp }) {
                                 <button
                                   type="button"
                                   onClick={() =>
-                                    downloadMedia(
-                                      msg.fileUrl || msg.file?.dataUrl || msg.file,
-                                      msg.fileName || msg.file?.name || "Document"
-                                    )
+                                    openDownloadModal({
+                                      url: msg.fileUrl || msg.file?.dataUrl || msg.file,
+                                      name: msg.fileName || msg.file?.name || "Document",
+                                      size: msg.fileSize || msg.file?.size,
+                                      type: getMediaType(msg.fileName || msg.file?.name || "Document"),
+                                    })
                                   }
+                                  title="Download file"
                                   className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 flex items-center justify-center transition cursor-pointer"
                                 >
                                   <Download className="w-3.5 h-3.5" />
