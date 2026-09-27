@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Camera,
@@ -106,16 +107,16 @@ export default function ProfileHeader({ isOpen, onClose }) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       onClick={onClose}
-      className={`fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 z-50 transition-opacity duration-150 ease-out ${
+      className={`fixed inset-0 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 z-[9999] transition-opacity duration-150 ease-out ${
         isAnimating ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`border border-zinc-800 bg-[#16161b] w-full max-w-md rounded-2xl p-5 sm:p-6 shadow-2xl relative flex flex-col gap-4 transition-all duration-150 ease-out overflow-hidden ${
+        className={`border border-zinc-800 bg-[#16161b] w-full max-w-md sm:max-w-xl md:max-w-2xl max-h-[92dvh] rounded-2xl p-5 sm:p-6 shadow-2xl relative flex flex-col transition-all duration-150 ease-out overflow-hidden ${
           isAnimating
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-98 translate-y-1 pointer-events-none"
@@ -125,199 +126,208 @@ export default function ProfileHeader({ isOpen, onClose }) {
         <button
           onClick={onClose}
           title="Close (Esc)"
-          className="absolute top-4 right-4 w-7 h-7 rounded-lg bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-800 flex items-center justify-center transition cursor-pointer"
+          className="absolute top-4 right-4 w-7 h-7 rounded-lg bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-800 flex items-center justify-center transition cursor-pointer z-10"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {/* Modal Title */}
-        <div>
+        {/* Modal Header */}
+        <div className="shrink-0 mb-3.5 pr-8">
           <h2 className="text-sm font-semibold text-zinc-100">Settings</h2>
           <p className="text-xs text-zinc-400 mt-0.5">Profile & preferences</p>
         </div>
 
-        {/* Profile Avatar Card */}
-        <div className="flex flex-col items-center p-4 bg-[#1b1b22] rounded-xl border border-zinc-800/80 relative">
-          <div className="relative group">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 ring-1 ring-zinc-700/80 overflow-hidden flex items-center justify-center text-zinc-200 text-base font-semibold">
-              {authUser?.profilePic ? (
-                <img
-                  src={authUser.profilePic}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
+        {/* Modal Scrollable Body (Responsive 2-column on wider/constrained screens) */}
+        <div className="overflow-y-auto pr-0.5 sm:pr-1 flex-1 flex flex-col sm:flex-row gap-4 scrollbar-thin">
+          {/* Left Column: Profile Card + Actions */}
+          <div className="w-full sm:w-[220px] md:w-[240px] shrink-0 flex flex-col gap-3">
+            {/* Profile Avatar Card */}
+            <div className="flex flex-col items-center p-4 bg-[#1b1b22] rounded-xl border border-zinc-800/80 relative text-center">
+              <div className="relative group">
+                <div className="w-16 h-16 rounded-full bg-zinc-800 ring-1 ring-zinc-700/80 overflow-hidden flex items-center justify-center text-zinc-200 text-base font-semibold">
+                  {authUser?.profilePic ? (
+                    <img
+                      src={authUser.profilePic}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    initials
+                  )}
+                </div>
+
+                {/* Online Badge */}
+                <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-[#1b1b22]" />
+
+                {/* Change Photo Overlay Button */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  title="Change Profile Photo"
+                  className={`absolute inset-0 rounded-full bg-black/60 flex items-center justify-center text-white transition-opacity cursor-pointer ${
+                    isUploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                  }`}
+                >
+                  {isUploading ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-zinc-200" />
+                  ) : (
+                    <Camera className="w-4 h-4 text-zinc-200" />
+                  )}
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  className="hidden"
                 />
-              ) : (
-                initials
-              )}
+              </div>
+
+              <h3 className="text-sm font-medium text-zinc-100 mt-2.5 leading-tight truncate max-w-full">
+                {authUser?.fullName || "User"}
+              </h3>
+              <p className="text-xs text-zinc-400 mt-0.5 truncate max-w-full">{authUser?.email || "online"}</p>
+
+              <div className="mt-2.5 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-[11px] font-medium">
+                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                <span>Connected</span>
+              </div>
             </div>
 
-            {/* Online Badge */}
-            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-[#1b1b22]" />
+            {/* Danger Zone / Log Out Action */}
+            <div className="flex flex-col gap-2 mt-auto">
+              <button
+                onClick={logout}
+                disabled={isLoggingOut}
+                className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs border border-zinc-700/60 transition cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
+              </button>
 
-            {/* Change Photo Overlay Button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              title="Change Profile Photo"
-              className={`absolute inset-0 rounded-full bg-black/60 flex items-center justify-center text-white transition-opacity cursor-pointer ${
-                isUploading ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              }`}
-            >
-              {isUploading ? (
-                <Loader2 className="w-4 h-4 animate-spin text-zinc-200" />
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="text-[11px] text-zinc-500 hover:text-rose-400 transition cursor-pointer text-center py-0.5"
+                >
+                  Delete account
+                </button>
               ) : (
-                <Camera className="w-4 h-4 text-zinc-200" />
+                <div className="p-2.5 bg-rose-950/20 border border-rose-900/40 rounded-xl flex flex-col gap-2 text-center">
+                  <p className="text-[11px] text-rose-300 font-medium leading-tight">
+                    Are you sure? This cannot be undone.
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting}
+                      className="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-medium rounded-lg transition cursor-pointer flex items-center gap-1"
+                    >
+                      {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                      <span>{isDeleting ? "Deleting..." : "Yes, delete"}</span>
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                      className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] font-medium rounded-lg transition cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               )}
-            </button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageUpload}
-              accept="image/*"
-              className="hidden"
-            />
+            </div>
           </div>
 
-          <h3 className="text-sm font-medium text-zinc-100 mt-2.5 leading-tight">
-            {authUser?.fullName || "User"}
-          </h3>
-          <p className="text-xs text-zinc-400 mt-0.5">{authUser?.email || "online"}</p>
-
-          <div className="mt-2.5 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-700/60 text-zinc-300 text-[11px] font-medium">
-            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-            <span>Connected</span>
-          </div>
-        </div>
-
-        {/* Preferences & Settings */}
-        <div className="space-y-1.5 text-xs">
-          {/* Sound Notifications Toggle */}
-          <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
-                {isSoundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
+          {/* Right Column: Preferences & Info */}
+          <div className="flex-1 min-w-0 flex flex-col gap-2 text-xs">
+            {/* Sound Notifications Toggle */}
+            <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
+                  {isSoundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-500" />}
+                </div>
+                <div className="min-w-0">
+                  <span className="font-medium text-zinc-200 block text-xs">Message Sounds</span>
+                  <span className="text-[11px] text-zinc-400">
+                    {isSoundEnabled ? "Sound effects active" : "Sounds muted"}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="font-medium text-zinc-200 block text-xs">Message Sounds</span>
-                <span className="text-[11px] text-zinc-400">
-                  {isSoundEnabled ? "Sound effects active" : "Sounds muted"}
+              <button
+                onClick={toggleSound}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer shrink-0 ml-2 ${
+                  isSoundEnabled
+                    ? "bg-zinc-700 text-white hover:bg-zinc-600"
+                    : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                {isSoundEnabled ? "Enabled" : "Muted"}
+              </button>
+            </div>
+
+            {/* Browser Notifications Toggle */}
+            <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
+                  {notificationPermission === "granted" ? (
+                    <Bell className="w-3.5 h-3.5" />
+                  ) : (
+                    <BellOff className="w-3.5 h-3.5 text-zinc-500" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <span className="font-medium text-zinc-200 block text-xs">Browser Notifications</span>
+                  <span className="text-[11px] text-zinc-400 truncate block">
+                    {notificationPermission === "granted" ? "Enabled for background tabs" : "Notify for new messages"}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={handleEnableNotifications}
+                disabled={notificationPermission === "granted"}
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer shrink-0 ml-2 ${
+                  notificationPermission === "granted"
+                    ? "bg-zinc-800 text-zinc-400 cursor-default"
+                    : "bg-indigo-600 text-white hover:bg-indigo-500"
+                }`}
+              >
+                {notificationPermission === "granted" ? "Enabled" : "Enable"}
+              </button>
+            </div>
+
+            {platform !== "installed" && (
+              <button
+                type="button"
+                onClick={openInstall}
+                className="flex w-full items-center gap-2.5 rounded-xl border border-zinc-800 bg-[#1b1b22] p-2.5 sm:p-3 text-left transition hover:border-zinc-700 cursor-pointer"
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300">
+                  <Download className="h-3.5 w-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-medium text-zinc-200">Install BaatCheet</span>
+                  <span className="text-[11px] text-zinc-400">Run in standalone window</span>
+                </div>
+              </button>
+            )}
+
+            {/* Security & Encryption Info */}
+            <div className="flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
+              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 shrink-0">
+                <ShieldCheck className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="font-medium text-zinc-200 block text-xs">End-to-End Encryption</span>
+                <span className="text-[11px] text-zinc-400 block leading-tight">
+                  All messages and media transfers are encrypted.
                 </span>
               </div>
             </div>
-            <button
-              onClick={toggleSound}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
-                isSoundEnabled
-                  ? "bg-zinc-700 text-white hover:bg-zinc-600"
-                  : "bg-zinc-800 text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              {isSoundEnabled ? "Enabled" : "Muted"}
-            </button>
           </div>
-
-          {/* Browser Notifications Toggle */}
-          <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300 shrink-0">
-                {notificationPermission === "granted" ? (
-                  <Bell className="w-3.5 h-3.5" />
-                ) : (
-                  <BellOff className="w-3.5 h-3.5 text-zinc-500" />
-                )}
-              </div>
-              <div>
-                <span className="font-medium text-zinc-200 block text-xs">Browser Notifications</span>
-                <span className="text-[11px] text-zinc-400">
-                  {notificationPermission === "granted" ? "Enabled for background tabs" : "Notify for new messages"}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={handleEnableNotifications}
-              disabled={notificationPermission === "granted"}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
-                notificationPermission === "granted"
-                  ? "bg-zinc-800 text-zinc-400 cursor-default"
-                  : "bg-indigo-600 text-white hover:bg-indigo-500"
-              }`}
-            >
-              {notificationPermission === "granted" ? "Enabled" : "Enable"}
-            </button>
-          </div>
-
-          {platform !== "installed" && (
-            <button
-              type="button"
-              onClick={openInstall}
-              className="flex w-full items-center gap-2.5 rounded-xl border border-zinc-800 bg-[#1b1b22] p-2.5 text-left transition hover:border-zinc-700"
-            >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-300">
-                <Download className="h-3.5 w-3.5" />
-              </div>
-              <div>
-                <span className="block text-xs font-medium text-zinc-200">Install BaatCheet</span>
-                <span className="text-[11px] text-zinc-400">Run in standalone window</span>
-              </div>
-            </button>
-          )}
-
-          {/* Security & Encryption Info */}
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#1b1b22] border border-zinc-800/80">
-            <div className="w-7 h-7 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 shrink-0">
-              <ShieldCheck className="w-3.5 h-3.5" />
-            </div>
-            <div>
-              <span className="font-medium text-zinc-200 block text-xs">End-to-End Encryption</span>
-              <span className="text-[11px] text-zinc-400">
-                All messages and media transfers are encrypted.
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Danger Zone / Log Out Action */}
-        <div className="pt-1 flex flex-col gap-2">
-          <button
-            onClick={logout}
-            disabled={isLoggingOut}
-            className="flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium text-xs border border-zinc-700/60 transition cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>{isLoggingOut ? "Logging out..." : "Log out"}</span>
-          </button>
-
-          {!showDeleteConfirm ? (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="text-[11px] text-zinc-500 hover:text-rose-400 transition cursor-pointer text-center py-0.5"
-            >
-              Delete account
-            </button>
-          ) : (
-            <div className="p-2.5 bg-rose-950/20 border border-rose-900/40 rounded-xl flex flex-col gap-2 text-center">
-              <p className="text-[11px] text-rose-300 font-medium">Are you sure? This cannot be undone.</p>
-              <div className="flex items-center justify-center gap-2">
-                <button
-                  onClick={handleDeleteAccount}
-                  disabled={isDeleting}
-                  className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium rounded-lg transition cursor-pointer flex items-center gap-1.5"
-                >
-                  {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                  <span>{isDeleting ? "Deleting..." : "Yes, delete"}</span>
-                </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  disabled={isDeleting}
-                  className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-lg transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

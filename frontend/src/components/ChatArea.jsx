@@ -64,6 +64,7 @@ export default function ChatArea({ onOpenHelp }) {
 
   // Message action states
   const [activeMenuMessageId, setActiveMenuMessageId] = useState(null);
+  const [menuOpensUpward, setMenuOpensUpward] = useState(false);
   const [activeReactionMessageId, setActiveReactionMessageId] = useState(null);
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingText, setEditingText] = useState("");
@@ -84,6 +85,18 @@ export default function ChatArea({ onOpenHelp }) {
     };
     window.addEventListener("click", handleWindowClick);
     return () => window.removeEventListener("click", handleWindowClick);
+  }, []);
+
+  // Close message menus on scroll within the message container
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    const handleScroll = () => {
+      setActiveMenuMessageId(null);
+      setActiveReactionMessageId(null);
+    };
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Track chat change to reset initial load status
@@ -307,24 +320,26 @@ export default function ChatArea({ onOpenHelp }) {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center min-w-0">
-              <h2 className="text-xs md:text-sm font-medium text-zinc-100 leading-tight truncate">
+            <div className="flex flex-col justify-center min-w-0 h-9 md:h-10">
+              <h2
+                className={`text-xs md:text-sm font-medium text-zinc-100 leading-tight truncate transition-all duration-300 ease-out ${
+                  selectedUser.online ? "-translate-y-0.5" : "translate-y-0"
+                }`}
+              >
                 {selectedUser.fullName}
               </h2>
 
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {selectedUser.online ? (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                    <span className="text-[11px] font-normal text-zinc-400 leading-tight">
-                      Online
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-[11px] font-normal text-zinc-500 leading-tight">
-                    Offline
-                  </span>
-                )}
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-out flex items-center gap-1.5 ${
+                  selectedUser.online
+                    ? "max-h-5 opacity-100 mt-0.5 translate-y-0"
+                    : "max-h-0 opacity-0 -translate-y-1 pointer-events-none"
+                }`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="text-[10px] md:text-[11px] font-normal text-zinc-400 leading-tight">
+                  Online
+                </span>
               </div>
             </div>
           </div>
@@ -463,6 +478,20 @@ export default function ChatArea({ onOpenHelp }) {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                const isOpening = activeMenuMessageId !== msg._id;
+                                if (isOpening) {
+                                  const buttonRect = e.currentTarget.getBoundingClientRect();
+                                  const containerRect = messagesContainerRef.current?.getBoundingClientRect();
+                                  if (containerRect) {
+                                    const spaceBelow = containerRect.bottom - buttonRect.bottom;
+                                    const spaceAbove = buttonRect.top - containerRect.top;
+                                    // Open upwards if near the bottom and there is more room above
+                                    setMenuOpensUpward(spaceBelow < 220 && spaceAbove > spaceBelow);
+                                  } else {
+                                    const spaceBelow = window.innerHeight - buttonRect.bottom;
+                                    setMenuOpensUpward(spaceBelow < 220);
+                                  }
+                                }
                                 setActiveMenuMessageId(isMenuOpen ? null : msg._id);
                                 setActiveReactionMessageId(null);
                               }}
@@ -478,7 +507,9 @@ export default function ChatArea({ onOpenHelp }) {
                             {isMenuOpen && (
                               <div
                                 onClick={(e) => e.stopPropagation()}
-                                className={`absolute top-6 ${
+                                className={`absolute ${
+                                  menuOpensUpward ? "bottom-full mb-1" : "top-6"
+                                } ${
                                   isMe ? "right-0" : "left-0"
                                 } z-40 w-44 rounded-xl bg-[#1c1c22] border border-zinc-800 shadow-xl py-1 text-xs text-zinc-200 flex flex-col`}
                               >
