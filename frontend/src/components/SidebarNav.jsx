@@ -9,10 +9,16 @@ import {
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
-import ProfileHeader from "./ProfileHeader";
+import ProfileHeader from "./profileHeader";
 
 export default function SidebarNav() {
-  const { activeTab, setActiveTab, isSoundEnabled, toggleSound } = useChatStore();
+  const {
+    activeTab,
+    setActiveTab,
+    isSoundEnabled,
+    toggleSound,
+    setMediaContactFilter,
+  } = useChatStore();
   const { authUser } = useAuthStore();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
@@ -69,8 +75,11 @@ export default function SidebarNav() {
 
           {/* Files */}
           <button
-            onClick={() => setActiveTab("files")}
-            title="Files"
+            onClick={() => {
+              setMediaContactFilter("all");
+              setActiveTab("files");
+            }}
+            title="Files & Media"
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
               activeTab === "files"
                 ? "bg-zinc-800 text-white font-medium"

@@ -4,6 +4,7 @@ import {
   getChatPartners,
   getAllContacts,
   getMessages,
+  getAllMediaFiles,
   sendMessage,
   deleteMessageForMe,
   deleteMessageForEveryone,
@@ -19,6 +20,7 @@ router.use(protectRoute);
 
 router.get("/contacts", getAllContacts);
 router.get("/chats", getChatPartners);
+router.get("/media", getAllMediaFiles);
 router.get("/:id", getMessages);
 router.post("/send/:id", sendMessage);
 

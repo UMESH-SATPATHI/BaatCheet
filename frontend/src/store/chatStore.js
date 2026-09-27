@@ -59,6 +59,15 @@ export const useChatStore = create((set, get) => ({
   isMessageLoading: false,
   isSoundEnabled: localStorage.getItem("isSoundEnabled") !== "false",
 
+  // Media Files Gallery State
+  allMedia: [],
+  isMediaLoading: false,
+  mediaFilterType: "all", // "all" | "image" | "video" | "doc" | "audio"
+  mediaContactFilter: "all", // "all" or specific contactId
+  mediaSearchQuery: "",
+  mediaSortOrder: "newest", // "newest" | "oldest"
+  mediaViewMode: "grid", // "grid" | "list"
+
   // Multi-select message state
   isSelectionMode: false,
   selectedMessageIds: [],
@@ -118,6 +127,34 @@ export const useChatStore = create((set, get) => ({
 
   setContactSearchQuery: (contactSearchQuery) => {
     set({ contactSearchQuery });
+  },
+
+  setMediaFilterType: (mediaFilterType) => set({ mediaFilterType }),
+  setMediaContactFilter: (mediaContactFilter) => {
+    set({ mediaContactFilter });
+    get().getAllMediaFiles(mediaContactFilter);
+  },
+  setMediaSearchQuery: (mediaSearchQuery) => set({ mediaSearchQuery }),
+  setMediaSortOrder: (mediaSortOrder) => set({ mediaSortOrder }),
+  setMediaViewMode: (mediaViewMode) => set({ mediaViewMode }),
+
+  getAllMediaFiles: async (contactId = null) => {
+    try {
+      set({ isMediaLoading: true });
+      const targetContact = contactId !== undefined && contactId !== null
+        ? contactId
+        : get().mediaContactFilter;
+      const url = targetContact && targetContact !== "all"
+        ? `/messages/media?contactId=${targetContact}`
+        : `/messages/media`;
+      const res = await axiosInstance.get(url);
+      set({ allMedia: res.data || [] });
+    } catch (error) {
+      console.error("Error fetching media files:", error);
+      toast.error(error.response?.data?.error || "Failed to load media files");
+    } finally {
+      set({ isMediaLoading: false });
+    }
   },
 
   syncOnlineUsers: (onlineUserIds) => {
@@ -348,6 +385,10 @@ export const useChatStore = create((set, get) => ({
               : m
           ),
         }));
+
+        if (messageData.image || messageData.video || messageData.file || messageData.fileUrl) {
+          get().getAllMediaFiles();
+        }
       }
     } catch (error) {
       console.log("Error sending message to server:", error.message);
@@ -423,6 +464,7 @@ export const useChatStore = create((set, get) => ({
   deleteForMe: async (messageId) => {
     set((state) => ({
       messages: state.messages.filter((m) => String(m._id) !== String(messageId)),
+      allMedia: state.allMedia.filter((item) => String(item.messageId) !== String(messageId)),
     }));
     try {
       await axiosInstance.delete(`/messages/${messageId}/me`);
@@ -448,6 +490,7 @@ export const useChatStore = create((set, get) => ({
             }
           : m
       ),
+      allMedia: state.allMedia.filter((item) => String(item.messageId) !== String(messageId)),
     }));
     try {
       await axiosInstance.delete(`/messages/${messageId}/everyone`);
@@ -477,6 +520,9 @@ export const useChatStore = create((set, get) => ({
               }
             : m
         ),
+        allMedia: state.allMedia.filter(
+          (item) => !messageIds.includes(String(item.messageId))
+        ),
         isSelectionMode: false,
         selectedMessageIds: [],
       }));
@@ -484,6 +530,9 @@ export const useChatStore = create((set, get) => ({
       set((state) => ({
         messages: state.messages.filter(
           (m) => !messageIds.includes(String(m._id))
+        ),
+        allMedia: state.allMedia.filter(
+          (item) => !messageIds.includes(String(item.messageId))
         ),
         isSelectionMode: false,
         selectedMessageIds: [],
@@ -594,6 +643,10 @@ export const useChatStore = create((set, get) => ({
       set({
         chats: [updatedChat, ...remainingChats],
       });
+
+      if (newMessage.image || newMessage.video || newMessage.fileUrl) {
+        get().getAllMediaFiles();
+      }
     });
 
     // 2. Message Reaction Updated
@@ -633,6 +686,7 @@ export const useChatStore = create((set, get) => ({
               }
             : m
         ),
+        allMedia: state.allMedia.filter((item) => String(item.messageId) !== String(messageId)),
       }));
     });
 

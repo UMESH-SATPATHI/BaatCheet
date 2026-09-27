@@ -4,6 +4,7 @@ import ChatsSidebar from "../components/ChatsSidebar";
 import ChatArea from "../components/ChatArea";
 import EmptyChatState from "../components/EmptyChatState";
 import ContactsView from "../components/ContactsView";
+import MediaFilesView from "../components/MediaFilesView";
 import HelpModal from "../components/HelpModal";
 import NewChatModal from "../components/NewChatModal";
 import { useChatStore } from "../store/chatStore";
@@ -52,14 +53,14 @@ export default function Chat() {
   return (
     <div className="flex h-[100dvh] max-h-[100dvh] min-h-[100dvh] w-full max-w-full bg-[#0e0e11] text-zinc-100 overflow-hidden select-none">
       {/* 1. Leftmost Navigation Rail */}
-      <div className={`${selectedUser ? "hidden md:flex" : "flex"} shrink-0 h-full`}>
+      <div className={`${selectedUser && activeTab === "chats" ? "hidden md:flex" : "flex"} shrink-0 h-full`}>
         <SidebarNav />
       </div>
 
       {/* 2. Middle Chats Sidebar */}
       <div
         className={`${
-          selectedUser || activeTab === "contacts"
+          selectedUser || activeTab === "contacts" || activeTab === "files"
             ? "hidden md:flex"
             : "flex flex-1 md:flex-initial"
         } h-full overflow-hidden`}
@@ -70,13 +71,15 @@ export default function Chat() {
       {/* 3. Main Center Content Area */}
       <div
         className={`${
-          !selectedUser && activeTab !== "contacts"
+          !selectedUser && activeTab !== "contacts" && activeTab !== "files"
             ? "hidden md:flex"
             : "flex"
         } flex-1 min-w-0 h-full overflow-hidden`}
       >
         {activeTab === "contacts" ? (
           <ContactsView onOpenHelp={() => setIsHelpOpen(true)} />
+        ) : activeTab === "files" ? (
+          <MediaFilesView onOpenHelp={() => setIsHelpOpen(true)} />
         ) : selectedUser ? (
           <ChatArea onOpenHelp={() => setIsHelpOpen(true)} />
         ) : (

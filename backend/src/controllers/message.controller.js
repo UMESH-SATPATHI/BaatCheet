@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
@@ -91,6 +92,125 @@ export const getChatPartners = async (req, res) => {
     res.status(200).json(chatPartnersWithPreviews);
   } catch (error) {
     console.error("Error in getChatPartners controller:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getAllMediaFiles = async (req, res) => {
+  try {
+    const loggedInUserId = req.user._id;
+    const { contactId } = req.query;
+
+    const baseConditions = [
+      {
+        deletedFor: { $ne: loggedInUserId },
+        isDeletedForEveryone: { $ne: true },
+      },
+      {
+        $or: [
+          { image: { $exists: true, $nin: [null, ""] } },
+          { video: { $exists: true, $nin: [null, ""] } },
+          { fileUrl: { $exists: true, $nin: [null, ""] } },
+        ],
+      },
+    ];
+
+    if (contactId && mongoose.Types.ObjectId.isValid(contactId)) {
+      baseConditions.push({
+        $or: [
+          { senderId: loggedInUserId, receiverId: contactId },
+          { senderId: contactId, receiverId: loggedInUserId },
+        ],
+      });
+    } else {
+      baseConditions.push({
+        $or: [
+          { senderId: loggedInUserId },
+          { receiverId: loggedInUserId },
+        ],
+      });
+    }
+
+    const messages = await Message.find({ $and: baseConditions })
+      .populate("senderId", "fullName email profilePic")
+      .populate("receiverId", "fullName email profilePic")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const mediaItems = [];
+
+    for (const msg of messages) {
+      const isSender = msg.senderId?._id?.toString() === loggedInUserId.toString();
+      const otherUser = isSender ? msg.receiverId : msg.senderId;
+
+      if (msg.image) {
+        mediaItems.push({
+          _id: `${msg._id}_image`,
+          messageId: msg._id,
+          type: "image",
+          url: msg.image,
+          name: msg.fileName || "Photo.jpg",
+          size: msg.fileSize || null,
+          fileType: "image",
+          sender: msg.senderId,
+          receiver: msg.receiverId,
+          isSender,
+          otherUser,
+          createdAt: msg.createdAt,
+          caption: msg.text || null,
+        });
+      }
+
+      if (msg.video) {
+        mediaItems.push({
+          _id: `${msg._id}_video`,
+          messageId: msg._id,
+          type: "video",
+          url: msg.video,
+          name: msg.fileName || "Video.mp4",
+          size: msg.fileSize || null,
+          fileType: "video",
+          sender: msg.senderId,
+          receiver: msg.receiverId,
+          isSender,
+          otherUser,
+          createdAt: msg.createdAt,
+          caption: msg.text || null,
+        });
+      }
+
+      if (msg.fileUrl) {
+        let detectedType = msg.fileType || "file";
+        const lowerName = (msg.fileName || "").toLowerCase();
+        if (lowerName.endsWith(".pdf")) detectedType = "pdf";
+        else if (lowerName.match(/\.(doc|docx|txt|rtf)$/)) detectedType = "doc";
+        else if (lowerName.match(/\.(xls|xlsx|csv)$/)) detectedType = "sheet";
+        else if (lowerName.match(/\.(zip|rar|7z|tar|gz)$/)) detectedType = "archive";
+        else if (lowerName.match(/\.(mp3|wav|ogg|m4a|aac)$/)) detectedType = "audio";
+        else if (lowerName.match(/\.(jpg|jpeg|png|gif|webp)$/)) detectedType = "image";
+        else if (lowerName.match(/\.(mp4|mov|webm)$/)) detectedType = "video";
+
+        mediaItems.push({
+          _id: `${msg._id}_file`,
+          messageId: msg._id,
+          type: detectedType,
+          url: msg.fileUrl,
+          name: msg.fileName || "Attachment",
+          size: msg.fileSize || null,
+          fileType: msg.fileType || detectedType,
+          sender: msg.senderId,
+          receiver: msg.receiverId,
+          isSender,
+          otherUser,
+          createdAt: msg.createdAt,
+          caption: msg.text || null,
+        });
+      }
+    }
+
+    res.status(200).json(mediaItems);
+  } catch (error) {
+    console.error("Error in getAllMediaFiles controller:", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -17,6 +17,7 @@ import {
   Trash2,
   CheckSquare,
   Loader2,
+  FileText,
 } from "lucide-react";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
@@ -49,6 +50,8 @@ export default function ChatArea({ onOpenHelp }) {
     toggleSelectMessage,
     clearSelection,
     setIsSelectionMode,
+    setActiveTab,
+    setMediaContactFilter,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
@@ -352,6 +355,17 @@ export default function ChatArea({ onOpenHelp }) {
               className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 flex items-center justify-center transition-colors cursor-pointer"
             >
               <Search className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => {
+                setMediaContactFilter(selectedUser._id);
+                setActiveTab("files");
+              }}
+              title="Shared media & files"
+              className="w-7 h-7 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <FileText className="w-4 h-4" />
             </button>
 
             <button
