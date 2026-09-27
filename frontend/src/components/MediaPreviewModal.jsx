@@ -15,8 +15,10 @@ import {
   File,
 } from "lucide-react";
 import { downloadMedia, getMediaType } from "../lib/downloadHelper";
+import { useChatStore } from "../store/chatStore";
 
 export default function MediaPreviewModal({ media, onClose }) {
+  const { openDownloadModal } = useChatStore();
   const [zoomLevel, setZoomLevel] = useState(1);
 
   // Close on Escape key
@@ -43,7 +45,12 @@ export default function MediaPreviewModal({ media, onClose }) {
   const fileName = media.name || (detectedType === "image" ? "Photo.jpg" : detectedType === "video" ? "Video.mp4" : "Attachment");
 
   const handleDownload = () => {
-    downloadMedia(media.url, fileName);
+    openDownloadModal({
+      url: media.url,
+      name: fileName,
+      size: media.size,
+      type: detectedType,
+    });
   };
 
   const handleOpenExternal = () => {
