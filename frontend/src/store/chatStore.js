@@ -68,6 +68,11 @@ export const useChatStore = create((set, get) => ({
   mediaSortOrder: "newest", // "newest" | "oldest"
   mediaViewMode: "grid", // "grid" | "list"
 
+  // Download confirmation modal state
+  downloadModalItem: null, // { url, name, size, type } | null
+  openDownloadModal: (item) => set({ downloadModalItem: item }),
+  closeDownloadModal: () => set({ downloadModalItem: null }),
+
   // Multi-select message state
   isSelectionMode: false,
   selectedMessageIds: [],

@@ -7,6 +7,7 @@ import ContactsView from "../components/ContactsView";
 import MediaFilesView from "../components/MediaFilesView";
 import HelpModal from "../components/HelpModal";
 import NewChatModal from "../components/NewChatModal";
+import DownloadConfirmModal from "../components/DownloadConfirmModal";
 import { useChatStore } from "../store/chatStore";
 import { useAuthStore } from "../store/authStore";
 
@@ -93,6 +94,7 @@ export default function Chat() {
         isOpen={isNewChatOpen}
         onClose={() => setIsNewChatOpen(false)}
       />
+      <DownloadConfirmModal />
     </div>
   );
 }

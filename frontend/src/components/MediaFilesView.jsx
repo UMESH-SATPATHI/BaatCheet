@@ -47,6 +47,7 @@ export default function MediaFilesView({ onOpenHelp }) {
     chats,
     setSelectedUser,
     setActiveTab,
+    openDownloadModal,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
@@ -140,7 +141,12 @@ export default function MediaFilesView({ onOpenHelp }) {
 
   const handleDownload = (e, item) => {
     e.stopPropagation();
-    downloadMedia(item.url, item.name || "download");
+    openDownloadModal({
+      url: item.url,
+      name: item.name || "download",
+      size: item.size,
+      type: item.type,
+    });
   };
 
   const formatDate = (dateString) => {
