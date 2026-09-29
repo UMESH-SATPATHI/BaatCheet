@@ -200,7 +200,7 @@ export const useChatStore = create((set, get) => ({
       // Mark as read in chats list
       set((state) => ({
         chats: state.chats.map((c) =>
-          String(c._id) === String(user._id) ? { ...c, unreadCount: 0 } : c
+          String(c._id) === String(user._id) ? {...c, unreadCount: 0 } : c
         ),
       }));
     }
